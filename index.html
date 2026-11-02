@@ -209,6 +209,34 @@ svg.reef{width:100%;height:auto;display:block;border-radius:12px}
 .lg-sky{align-content:start;padding-top:26px;height:340px}
 .lg-note{position:absolute;top:calc(100% + 74px);left:50%;transform:translateX(-50%) rotate(-4deg);background:var(--paper);color:var(--ink);font-size:11px;line-height:1.3;padding:5px 7px;width:130px;border:1px solid var(--line);border-radius:3px;overflow-wrap:anywhere}
 @media (prefers-reduced-motion:reduce){.rung.cur.just{animation:none}}
+.ideas-panel{border-top:1px dashed var(--line);padding-top:12px}
+.ideas-list{max-height:440px;overflow-y:auto;padding-right:4px}
+.ideas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;margin-top:6px}
+.idea{display:flex;justify-content:space-between;gap:8px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 10px;cursor:pointer;font-size:14px;min-width:0}
+.idea:hover:not([disabled]){border-color:var(--tide)}
+.idea.added{opacity:.55;cursor:default}
+.idea>span:first-child{min-width:0;overflow-wrap:anywhere}
+.chip-btn.on{background:var(--tide);border-color:var(--tide);border-style:solid;color:var(--surface)}
+.ocean svg{width:100%;height:auto;display:block;border-radius:12px}
+.bigclock{font:700 36px/1.1 var(--display);font-variant-numeric:tabular-nums}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.bob{animation:bob 3s ease-in-out infinite}
+@keyframes bub{from{transform:translateY(0);opacity:.7}to{transform:translateY(-40px);opacity:0}}
+.bub{animation:bub 2.4s ease-in infinite}
+.tipbox{background:var(--tide-soft);border-radius:10px;padding:10px 12px;font-size:13px}
+.creatures{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.crit{display:grid;justify-items:center;gap:4px;padding:8px;border-radius:10px;background:var(--bg);font-size:12px;text-align:center}
+.crit svg{width:60px;height:60px}
+.crit.missing{opacity:.6}
+#sp-svg svg{width:100%;max-width:420px;height:auto;display:block;margin:0 auto}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.sp-new{animation:pop .45s cubic-bezier(.3,1.6,.6,1);transform-box:fill-box;transform-origin:center}
+@keyframes pulse{50%{opacity:.35}}
+.sp-next{animation:pulse 1.6s ease-in-out infinite}
+.spcat{display:grid;gap:6px}
+.spname{font:600 13px var(--body);display:flex;align-items:center;gap:6px}
+.spname i{width:10px;height:10px;border-radius:50%;display:inline-block}
+@media (prefers-reduced-motion:reduce){.bob,.bub,.sp-new,.sp-next{animation:none}}
 footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.flipcard,.balloon,.balloon.float{transition:none}}
 </style>
@@ -267,6 +295,13 @@ footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
         </select>
         <button class="btn primary" type="submit">Add</button>
       </form>
+      <div class="row"><button class="btn" type="button" id="ideas-toggle">Need ideas? Browse 70+ tasks</button></div>
+      <div class="stack ideas-panel" id="ideas" hidden>
+        <input type="text" id="ideas-q" placeholder="Search ideas, e.g. walk, email, read" aria-label="Search task ideas">
+        <div class="row chips" id="ideas-cats"></div>
+        <div class="ideas-list" id="ideas-list"></div>
+        <div class="row"><button class="btn primary" type="button" id="ideas-done">Done</button><span class="note" id="ideas-msg" role="status"></span></div>
+      </div>
       <ul class="list" id="tasklist"></ul>
       <p class="note" style="margin:0">★ marks an essential. On low-energy days, only essentials stay on the plan.</p>
     </div>
@@ -364,6 +399,31 @@ footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
       </div>
     </div>
 
+    <div class="game" id="g-dive" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Focus Dive &middot; inspired by Deep Work</div><h2>Go deep on one thing</h2></div>
+        <p class="note" style="margin:0">Every focused minute takes you one meter deeper. Deeper water hides rarer creatures.</p>
+        <div class="ocean" id="dv-ocean"></div>
+        <div class="stack" id="dv-ctrl"></div>
+      </div>
+      <div class="card"><h3>Creatures found</h3><div class="creatures" id="dv-found"></div><h3>Recent dives</h3><ul class="list" id="dv-log"></ul></div>
+    </div>
+
+    <div class="game" id="g-spiral" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Upward Spiral &middot; inspired by The Upward Spiral</div><h2>Small actions, upward spiral</h2></div>
+        <p class="note" style="margin:0">When you're low, everything feels harder. Tiny actions nudge your brain the other way, and each one lifts you a step.</p>
+        <div id="sp-svg"></div>
+        <p class="note" id="sp-msg" role="status" style="margin:0;text-align:center">Tap any small action you've done today, or do one now.</p>
+      </div>
+      <div class="card">
+        <h3>Small actions that help</h3>
+        <div class="stack" id="sp-actions"></div>
+        <form class="ownrow" id="sp-form"><input type="text" id="sp-own" placeholder="Something else I did" aria-label="Your own action"><button class="btn" type="submit">Add step</button></form>
+      </div>
+      <div class="card"><div class="eyebrow">Steps this week</div><div class="wk" id="sp-week"></div><div class="wk-labels" id="sp-labels"></div></div>
+    </div>
+
     <div class="game" id="g-det" hidden>
       <div class="card">
         <div><div class="eyebrow">Habit Loop Detective &middot; inspired by Atomic Habits</div><h2>Crack the case of a habit you want to change</h2></div>
@@ -447,7 +507,7 @@ const DEF={
     {id:6,name:"Walk outside in daylight",tag:"lift",dur:20,ess:false,done:false}
   ],
   wake:"07:00",sleep:7,checkins:[],proofs:[],weeks:{},low:null,promptOffset:0,tfIndex:0,
-  habits:[],cases:[],ladder:{},ladderArea:"general",releases:0,flips:[]
+  habits:[],cases:[],ladder:{},ladderArea:"general",releases:0,flips:[],dives:[],creatures:[],dive:null,diveResult:null,spiral:{}
 };
 let S=Object.assign({},DEF,load()||{});
 const TAGS={deep:"Deep",creative:"Creative",social:"Social",shallow:"Shallow",lift:"Lift"};
@@ -594,7 +654,7 @@ function renderHist(){
 }
 
 // ---------- reflect ----------
-const PROMPTS=["What's one thing you handled today, even if it was small?","When did you help someone or make their day a bit easier?","What did you do today that past-you would have found hard?","What's one thing you're a little better at than a month ago?","What problem did you work through, even partly?","When did you keep going even though you didn't feel like it?","What's one kind thing you did for yourself today?","Who would say thank you to you for something this week, and for what?","What did you learn today, however small?","What's something you finished, started, or tidied up?"];
+const PROMPTS=["What's one thing you handled today, even if it was small?","When did you help someone or make their day a bit easier?","What did you do today that past-you would have found hard?","What's one thing you're a little better at than a month ago?","What problem did you work through, even partly?","When did you keep going even though you didn't feel like it?","What's one kind thing you did for yourself today?","Who would say thank you to you for something this week, and for what?","What did you learn today, however small?","What's something you finished, started, or tidied up?","What's one moment today you'd like to remember? Stay with it for a few seconds.","What went well today, and what part did you play in it?","What did you do today that the person you want to become would do?","What's one tiny step you took, even if it felt too small to count?","When did you get some daylight or fresh air today?","What did you focus on deeply today, even for 15 minutes?","What did you choose not to do today, so you could do something that mattered more?","Where did you show yourself some kindness today?","What setback did you handle better than you would have a year ago?","What decision did you make today, even a small one?","What's one thing your body did for you today?","What are you looking forward to this week?","What habit did you keep today, even in its two-minute version?","What did you notice today that you usually rush past?","When did you feel most like yourself today?","What problem feels a little smaller now than it did this morning?","What would you like to thank yourself for today?","What good thing happened today, even by chance?","Who made you smile today, or whom did you make smile?","What did you start today that you'd been putting off?"];
 function dayIdx(){return Math.floor(Date.now()/864e5)}
 function renderPrompt(){document.getElementById("prompt").textContent=PROMPTS[(dayIdx()+S.promptOffset)%PROMPTS.length]}
 document.getElementById("pr-skip").onclick=()=>{S.promptOffset++;commit()};
@@ -675,6 +735,8 @@ document.getElementById("br-start").onclick=()=>{
 // ---------- games hub ----------
 const GAMES=[
  {id:"reef",name:"Reef Builder",tag:"Stack tiny habits and grow a coral reef.",src:"Atomic Habits"},
+ {id:"dive",name:"Focus Dive",tag:"Each focused minute takes you a meter deeper.",src:"Deep Work"},
+ {id:"spiral",name:"Upward Spiral",tag:"Tiny actions that lift a low mood, step by step.",src:"The Upward Spiral"},
  {id:"det",name:"Habit Loop Detective",tag:"Crack the cue, craving and reward behind a habit.",src:"Atomic Habits"},
  {id:"ladder",name:"Believability Ladder",tag:"Kinder self-talk, one believable step at a time.",src:"You Can Heal Your Life"},
  {id:"let",name:"Letting Go",tag:"Write down what you're carrying, then release it.",src:"You Can Heal Your Life"},
@@ -682,6 +744,8 @@ const GAMES=[
  {id:"breath",name:"Breathing Balloon",tag:"Box breathing to settle your body.",src:"Breathwork"}
 ];
 const GLYPH={
+ dive:'<rect x="4" y="4" width="36" height="36" rx="8" fill="#2B5E7A"/><ellipse cx="23" cy="25" rx="10" ry="4" fill="#E8B65A"/><circle cx="12" cy="24" r="4" fill="#F2C9A0"/><circle cx="29" cy="13" r="2" fill="none" stroke="#fff" stroke-width="1.2"/><circle cx="33" cy="9" r="1.5" fill="none" stroke="#fff" stroke-width="1.2"/>',
+ spiral:'<path d="M8 36c0 4 28 4 28 0s-28-4-28-8 28-4 28-8-28-4-28-8 28-4 28-8" fill="none" stroke="var(--tide)" stroke-width="2.5" stroke-linecap="round"/><circle cx="36" cy="12" r="4" fill="var(--sun)"/>',
  reef:'<rect x="4" y="37" width="36" height="5" rx="2.5" fill="var(--sand)"/><path d="M22 38V20M22 27l-7-8M22 23l6-9M15 19l-3-6M28 14l3-5" stroke="var(--coral-a)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="34" cy="33" r="4" fill="var(--coral-d)"/><circle cx="9" cy="33" r="3" fill="var(--coral-b)"/>',
  det:'<circle cx="19" cy="19" r="11" fill="none" stroke="var(--social)" stroke-width="3"/><path d="M27 27l10 10" stroke="var(--social)" stroke-width="4" stroke-linecap="round"/><path d="M13.5 19a5.5 5.5 0 0 1 5.5-5.5" stroke="var(--social)" stroke-width="2" fill="none" stroke-linecap="round"/>',
  ladder:'<path d="M14 4v36M30 4v36" stroke="var(--creative)" stroke-width="3" stroke-linecap="round"/><path d="M14 12h16M14 21h16M14 30h16" stroke="var(--creative)" stroke-width="3"/>',
@@ -693,6 +757,8 @@ let curGame=null;
 const plural=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
 function tileStat(id){
   if(id==="reef")return plural(S.habits.length,"habit");
+  if(id==="dive")return S.dive?"diving now":S.dives.length?`deepest ${Math.max(...S.dives.map(d=>d.depth))} m`:"0 dives";
+  if(id==="spiral")return `${(S.spiral[todayStr()]||[]).length} of 15 today`;
   if(id==="det")return `${S.cases.length} solved`;
   if(id==="ladder")return `${Object.values(S.ladder).reduce((a,b)=>a+b,0)} of 25 rungs`;
   if(id==="let")return `${S.releases} released`;
@@ -708,7 +774,7 @@ function openGame(id){curGame=id;$("hubwrap").hidden=true;$("g-back").hidden=fal
 $("g-back").onclick=()=>{showHub();window.scrollTo(0,0)};
 function renderGames(){
   if(!curGame){renderHub();return}
-  ({reef:renderReef,flip:renderFlipOwn,det:renderDet,ladder:renderLadder,let:()=>{if(!lgBusy)renderLet()}}[curGame]||(()=>{}))();
+  ({reef:renderReef,dive:renderDive,spiral:renderSpiral,flip:renderFlipOwn,det:renderDet,ladder:renderLadder,let:()=>{if(!lgBusy)renderLet()}}[curGame]||(()=>{}))();
 }
 function chipRow(el,list,fn){el.innerHTML="";list.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip-btn";b.textContent=t;b.onclick=()=>fn(t);el.appendChild(b)})}
 function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -971,6 +1037,156 @@ function renderFlipOwn(){
 }
 $("tf-mode").onclick=()=>{const own=!$("tf-own").hidden;$("tf-own").hidden=own;$("tf-deckcard").hidden=!own;$("tf-mode").textContent=own?"Write my own thought":"Practice with example cards"};
 
+// ---------- task ideas ----------
+const IDEAS={
+ "Work & study":[["Write 300 words of a draft","deep",60],["Read one research paper","deep",60],["Analyze data or results","deep",90],["Code a feature or fix a bug","deep",90],["Study for an exam or test","deep",60],["Review someone's work","deep",45],["Plan this week's priorities","deep",30],["Outline a report or chapter","creative",45],["Prepare slides for a talk","creative",60],["Brainstorm ideas for a project","creative",30],["Team meeting","social",60],["One-on-one with my manager or supervisor","social",30],["Reply to work messages","shallow",30],["Update project notes","shallow",15],["Organize files and folders","shallow",30],["Submit a form or report","shallow",15]],
+ "Home & chores":[["Do the laundry","shallow",30],["Wash the dishes","shallow",15],["Tidy one room","shallow",30],["Clean the bathroom","shallow",30],["Change the bedsheets","shallow",15],["Take out the trash","shallow",15],["Grocery shopping","shallow",45],["Plan meals for the week","shallow",15],["Cook a proper meal","creative",45],["Water the plants","lift",15],["Fix something that's broken","shallow",30]],
+ "Health & body":[["Go for a walk","lift",30],["Work out or play a sport","lift",45],["Stretch or do yoga","lift",15],["Get some sunlight outside","lift",15],["Drink a full bottle of water","lift",15],["Prepare a healthy snack","shallow",15],["Take my medicine or vitamins","shallow",15],["Book a doctor or dentist appointment","shallow",15],["Wind down early for bed","lift",30]],
+ "Mind & mood":[["Journal for 10 minutes","lift",15],["Meditate","lift",15],["Do a breathing exercise","lift",15],["Read for pleasure","lift",30],["Listen to music I love","lift",15],["Write down three good things","lift",15],["Take a real break with no screens","lift",15],["Do an ebb check-in","lift",15]],
+ "People":[["Call a family member","social",30],["Message a friend","social",15],["Meet a friend","social",60],["Thank someone","social",15],["Help someone with something","social",30],["Plan something fun with someone","social",15],["Reply to personal messages","shallow",15],["Spend time with my partner or family","social",60]],
+ "Admin & money":[["Pay bills","shallow",15],["Check my budget or bank account","shallow",15],["Reply to important emails","shallow",30],["Clear my inbox","shallow",30],["Do paperwork or fill a form","shallow",30],["Schedule appointments","shallow",15],["Renew a document or subscription","shallow",15],["Back up my phone or laptop","shallow",15]],
+ "Creative & hobbies":[["Draw or paint","creative",45],["Play an instrument","creative",30],["Write something just for fun","creative",30],["Take photos on a walk","creative",45],["Work on a side project","creative",60],["Try a new recipe","creative",45],["Do a craft or DIY project","creative",60]],
+ "Learning & growth":[["Practice a language","deep",30],["Read a chapter of a non-fiction book","deep",30],["Watch a lecture or talk","deep",45],["Do one lesson of an online course","deep",45],["Follow a tutorial to learn a skill","deep",30]]
+};
+let ideaCat="All";
+function renderIdeas(){
+  const cats=$("ideas-cats");cats.innerHTML="";
+  ["All",...Object.keys(IDEAS)].forEach(c=>{const b=document.createElement("button");b.type="button";b.className="chip-btn"+(c===ideaCat?" on":"");b.setAttribute("aria-pressed",c===ideaCat);b.textContent=c;b.onclick=()=>{ideaCat=c;renderIdeas()};cats.appendChild(b)});
+  const q=$("ideas-q").value.trim().toLowerCase(),have=new Set(S.examples?[]:S.tasks.map(t=>t.name));
+  let html="";
+  Object.entries(IDEAS).forEach(([cat,list])=>{
+    if(ideaCat!=="All"&&ideaCat!==cat)return;
+    const items=list.filter(i=>!q||i[0].toLowerCase().includes(q));if(!items.length)return;
+    html+=`<div class="eyebrow" style="margin-top:6px">${cat}</div><div class="ideas-grid">${items.map(([n,t,d])=>`<button type="button" class="idea${have.has(n)?" added":""}" data-n="${esc(n)}" data-t="${t}" data-d="${d}"${have.has(n)?" disabled":""}><span>${have.has(n)?"✓ ":"+ "}${esc(n)}</span><span class="row" style="gap:6px;flex-wrap:nowrap"><span class="fit">${d}m</span><span class="chip t-${t}">${TAGS[t]}</span></span></button>`).join("")}</div>`;
+  });
+  const sc=$("ideas-list").scrollTop;
+  $("ideas-list").innerHTML=html||'<p class="note">No matches. Type your own task in the box above instead.</p>';
+  $("ideas-list").scrollTop=sc;
+  $("ideas-list").querySelectorAll(".idea:not([disabled])").forEach(b=>b.onclick=()=>{
+    if(S.examples){S.tasks=[];S.examples=false}
+    S.tasks.push({id:Date.now()+Math.random(),name:b.dataset.n,tag:b.dataset.t,dur:+b.dataset.d,ess:false,done:false});
+    $("ideas-msg").textContent=`Added "${b.dataset.n}".`;commit();
+  });
+}
+$("ideas-toggle").onclick=()=>{const p=$("ideas");p.hidden=!p.hidden;$("ideas-toggle").textContent=p.hidden?"Need ideas? Browse 70+ tasks":"Hide task ideas";if(!p.hidden)renderIdeas()};
+$("ideas-q").oninput=renderIdeas;
+$("ideas-done").onclick=()=>{$("ideas").hidden=true;$("ideas-toggle").textContent="Need ideas? Browse 70+ tasks"};
+
+// ---------- Focus Dive (Deep Work) ----------
+const CREATURES=[{d:5,id:"fish",name:"Clownfish"},{d:15,id:"turtle",name:"Sea turtle"},{d:25,id:"jelly",name:"Jellyfish"},{d:40,id:"ray",name:"Manta ray"},{d:60,id:"whale",name:"Blue whale"},{d:85,id:"angler",name:"Anglerfish"}];
+function creatureSVG(id,x,y,s){
+  const g=`<g transform="translate(${x},${y}) scale(${s})">`;
+  if(id==="fish")return g+`<ellipse cx="0" cy="0" rx="18" ry="11" fill="#F08A3C"/><path d="M16 0l14-10v20z" fill="#F08A3C"/><rect x="-6" y="-11" width="5" height="22" fill="#fff" opacity=".9"/><circle cx="-10" cy="-3" r="2.5" fill="#1C2A2B"/></g>`;
+  if(id==="turtle")return g+`<ellipse cx="0" cy="0" rx="26" ry="16" fill="#5E8C4A"/><ellipse cx="0" cy="0" rx="18" ry="10" fill="#7FA864"/><circle cx="-30" cy="-2" r="7" fill="#8DB07A"/><ellipse cx="-12" cy="16" rx="10" ry="4" fill="#8DB07A"/><ellipse cx="14" cy="16" rx="10" ry="4" fill="#8DB07A"/></g>`;
+  if(id==="jelly")return g+`<path d="M-20 0a20 18 0 0 1 40 0z" fill="#E7A6D8" opacity=".9"/>${[-14,-5,5,14].map(dx=>`<path d="M${dx} 0q4 10 0 20q-4 10 0 20" stroke="#E7A6D8" stroke-width="2.5" fill="none" opacity=".8"/>`).join("")}</g>`;
+  if(id==="ray")return g+`<path d="M0 -14L40 6L0 12L-40 6z" fill="#3E5C76"/><path d="M0 12l2 30" stroke="#3E5C76" stroke-width="2.5"/><circle cx="-6" cy="-4" r="2" fill="#fff"/><circle cx="6" cy="-4" r="2" fill="#fff"/></g>`;
+  if(id==="whale")return g+`<ellipse cx="0" cy="0" rx="60" ry="20" fill="#5B7FA6"/><path d="M55 -2l26 -16v34z" fill="#5B7FA6"/><path d="M-50 6q40 18 90 4" stroke="#A9C2DA" stroke-width="5" fill="none"/><circle cx="-38" cy="-5" r="3" fill="#0B1A2A"/></g>`;
+  return g+`<circle cx="0" cy="0" r="18" fill="#3B2F4A"/><path d="M-4 -16q-6 -22 10 -26" stroke="#3B2F4A" stroke-width="2.5" fill="none"/><circle cx="7" cy="-42" r="5" fill="#F7E27A"/><path d="M-14 6l6 -4l4 6l4 -6l4 6l4 -6l6 4" stroke="#fff" stroke-width="1.5" fill="none"/><circle cx="-6" cy="-6" r="3" fill="#F7E27A"/></g>`;
+}
+let diveTimer=null,dvChoice=null;
+const fmtClock=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`};
+function diveDepth(d,now=Date.now()){const mins=Math.min(now-d.start,d.dur*60000)/60000;return Math.max(0,mins-2*d.distr)}
+function oceanColor(depth){const t=Math.min(depth/90,1);const a=[124,196,214],b=[8,22,46];return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(",")})`}
+function drawOcean(depth,active){
+  const top=oceanColor(Math.max(0,depth-15)),bot=oceanColor(depth+15);
+  let s=`<svg viewBox="0 0 600 300" role="img" aria-label="Ocean at ${Math.round(depth)} meters"><defs><linearGradient id="ocG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient></defs><rect width="600" height="300" fill="url(#ocG)"/>`;
+  if(depth<12)s+=`<rect width="600" height="${Math.max(0,(12-depth)*10)}" fill="#fff" opacity=".18"/>`;
+  for(let m=Math.floor((depth-14)/5)*5;m<=depth+15;m+=5){if(m<0)continue;const y=150+(m-depth)*10;s+=`<line x1="560" x2="${m%10?574:590}" y1="${y}" y2="${y}" stroke="#fff" opacity=".6"/>${m%10?"":`<text x="552" y="${y+4}" text-anchor="end" font-size="11" fill="#fff" opacity=".8" font-family="JetBrains Mono,monospace">${m}m</text>`}`}
+  CREATURES.forEach((c,i)=>{const y=150+(c.d-depth)*10;if(y>-60&&y<360)s+=creatureSVG(c.id,i%2?150:420,y,c.id==="whale"?1:1.1)});
+  const lowDepth=depth>45;
+  if(lowDepth)s+=`<circle cx="300" cy="150" r="140" fill="#fff" opacity=".05"/>`;
+  s+=`<g class="${active?"bob":""}"><g transform="translate(300,150)"><ellipse cx="0" cy="4" rx="34" ry="11" fill="#E8B65A"/><circle cx="-38" cy="0" r="11" fill="#F2C9A0"/><rect x="-46" y="-9" width="14" height="9" rx="3" fill="#7CC4D6" stroke="#1C2A2B" stroke-width="1.5"/><rect x="-6" y="-12" width="22" height="9" rx="3" fill="#2C6F68"/><path d="M32 2l18 -10l2 14z M32 8l18 4l-4 10z" fill="#1C2A2B"/></g></g>`;
+  for(let i=0;i<4;i++)s+=`<circle class="${active?"bub":""}" style="animation-delay:${i*.6}s" cx="${262+i*5}" cy="${134-i*14}" r="${2+i}" fill="none" stroke="#fff" stroke-width="1.2" opacity=".7"/>`;
+  s+=`<text x="16" y="28" font-size="22" font-weight="700" fill="#fff" font-family="Bricolage Grotesque,sans-serif">${Math.floor(depth)} m</text>`;
+  return s+"</svg>";
+}
+function finishDive(){
+  const d=S.dive;if(!d)return;
+  const depth=diveDepth(d),found=CREATURES.filter(c=>depth>=c.d).map(c=>c.id),newOnes=found.filter(f=>!S.creatures.includes(f));
+  S.creatures=[...new Set([...S.creatures,...found])];
+  const mins=Math.round(Math.min(Date.now()-d.start,d.dur*60000)/60000);
+  S.dives.unshift({date:todayStr(),mins,planned:d.dur,depth:Math.floor(depth),distr:d.distr,task:d.task||""});S.dives=S.dives.slice(0,40);
+  S.diveResult={mins,depth:Math.floor(depth),distr:d.distr,newOnes,task:d.task,taskId:d.taskId};
+  S.dive=null;clearInterval(diveTimer);diveTimer=null;releaseWake();commit();
+}
+let wakeLock=null;
+async function holdWake(){try{if(navigator.wakeLock)wakeLock=await navigator.wakeLock.request("screen")}catch(e){}}
+function releaseWake(){try{if(wakeLock)wakeLock.release()}catch(e){}wakeLock=null}
+function ensureDiveTimer(){if(S.dive&&!diveTimer)diveTimer=setInterval(()=>{const d=S.dive;if(!d){clearInterval(diveTimer);diveTimer=null;return}
+  if(Date.now()-d.start>=d.dur*60000){finishDive();return}
+  if(curGame==="dive"){$("dv-ocean").innerHTML=drawOcean(diveDepth(d),true);const r=$("dv-left");if(r)r.textContent=fmtClock(d.start+d.dur*60000-Date.now())}},1000)}
+function renderDive(){
+  const ctrl=$("dv-ctrl");
+  if(S.dive){
+    const d=S.dive;ensureDiveTimer();
+    $("dv-ocean").innerHTML=drawOcean(diveDepth(d),true);
+    ctrl.innerHTML=`<div class="spread"><div><div class="eyebrow">Time left</div><div class="bigclock" id="dv-left">${fmtClock(d.start+d.dur*60000-Date.now())}</div></div><div class="note" style="text-align:right">${d.task?`Focusing on<br><strong style="color:var(--ink)">${esc(d.task)}</strong>`:"Stay with one thing"}</div></div><div class="row"><button class="btn primary" id="dv-distr">I got distracted</button><button class="btn" id="dv-end">End dive</button></div><p class="note" id="dv-msg" role="status" style="margin:0">${d.distr?plural(d.distr,"distraction")+" noticed so far. Noticing is the skill.":"If your mind wanders, tap the button and come back. Each one lifts you 2 m."}</p>`;
+    $("dv-distr").onclick=()=>{d.distr++;save();$("dv-ocean").innerHTML=drawOcean(diveDepth(d),true);$("dv-msg").textContent="Noticed. That's the skill. Back down you go.";};
+    $("dv-end").onclick=finishDive;
+    return;
+  }
+  if(S.diveResult){
+    const r=S.diveResult;
+    $("dv-ocean").innerHTML=drawOcean(r.depth,false);
+    ctrl.innerHTML=`<div class="eyebrow">Surfaced</div><p class="say" style="font-size:20px">You reached ${r.depth} m in ${plural(r.mins,"minute")} of focus${r.distr?`, noticing ${plural(r.distr,"distraction")}`:" with no distractions"}.</p>${r.newOnes.length?`<p style="margin:0">New creature${r.newOnes.length>1?"s":""} found: <strong>${r.newOnes.map(id=>CREATURES.find(c=>c.id===id).name).join(", ")}</strong></p>`:""}<label class="f">Shutdown note: where did you stop? Tomorrow-you will thank you.<input type="text" id="dv-note" placeholder="e.g. Next: finish the results paragraph"></label><div class="row">${r.taskId?`<button class="btn" id="dv-done">Mark task as done</button>`:""}<button class="btn primary" id="dv-again">Save and finish</button></div>`;
+    const dn=$("dv-done");if(dn)dn.onclick=()=>{const t=S.tasks.find(x=>x.id===r.taskId);if(t)t.done=true;dn.disabled=true;dn.textContent="Done";save()};
+    $("dv-again").onclick=()=>{const n=$("dv-note").value.trim();if(n&&S.dives[0])S.dives[0].note=n;S.diveResult=null;commit()};
+  }else{
+    const e=energyAt(nowClock()),lvl=e>0.7?"high":e>0.45?"medium":"low",sug=lvl==="high"?60:lvl==="medium"?25:15;
+    if(!dvChoice)dvChoice=sug;
+    $("dv-ocean").innerHTML=drawOcean(0,false);
+    const deepTasks=S.tasks.filter(t=>!t.done&&(t.tag==="deep"||t.tag==="creative"));
+    ctrl.innerHTML=`<p class="note" style="margin:0">Your forecast says energy is <strong style="color:var(--ink)">${lvl}</strong> right now, so ${sug} minutes is a good dive.${lvl==="low"?" A low-energy dive is fine. So is a walk first.":""}</p><div><div class="eyebrow" style="margin-bottom:6px">Dive length</div><div class="row chips" id="dv-len"></div></div><label class="f">What will you focus on?<select id="dv-task"><option value="">Just focus, no task picked</option>${deepTasks.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></label><div class="tipbox">Before you dive: put your phone in another room, close extra tabs, and keep water nearby.</div><div><button class="btn primary" id="dv-start">Start dive</button></div>`;
+    [15,25,45,60,90].forEach(m=>{const b=document.createElement("button");b.type="button";b.className="chip-btn"+(m===dvChoice?" on":"");b.setAttribute("aria-pressed",m===dvChoice);b.textContent=m+" min";b.onclick=()=>{dvChoice=m;renderDive()};$("dv-len").appendChild(b)});
+    $("dv-start").onclick=()=>{const sel=$("dv-task"),t=S.tasks.find(x=>String(x.id)===sel.value);S.dive={start:Date.now(),dur:dvChoice,distr:0,task:t?t.name:"",taskId:t?t.id:null};holdWake();commit()};
+  }
+  const f=$("dv-found");
+  f.innerHTML=CREATURES.map(c=>{const has=S.creatures.includes(c.id);return `<div class="crit${has?"":" missing"}"><svg viewBox="-50 -50 100 100" aria-hidden="true">${has?creatureSVG(c.id,0,0,c.id==="whale"?.6:1):`<text x="0" y="8" text-anchor="middle" font-size="26" fill="var(--muted)">?</text>`}</svg><span>${has?c.name:c.d+" m"}</span></div>`}).join("");
+  $("dv-log").innerHTML=S.dives.length?S.dives.slice(0,6).map(v=>`<li class="proof"><time>${v.date} · ${v.mins} min · ${v.depth} m${v.distr?` · ${plural(v.distr,"distraction")}`:""}</time>${v.task?esc(v.task):"Focus session"}${v.note?`<br><span class="note">Next: ${esc(v.note)}</span>`:""}</li>`).join(""):'<li class="note">Your dives are logged here.</li>';
+}
+
+// ---------- Upward Spiral (Korb) ----------
+const SPIRAL={
+ move:{name:"Move",col:"var(--coral-a)",why:"Movement, even five minutes, releases chemicals that lift mood and energy.",acts:["Walk for 5 minutes","Stretch for 2 minutes","Dance to one song","Take the stairs"]},
+ light:{name:"Light",col:"var(--sun)",why:"Daylight helps set your body clock, which supports mood and sleep.",acts:["Step outside into daylight","Open the curtains","Sit near a window for a meal"]},
+ thanks:{name:"Gratitude",col:"var(--coral-c)",why:"Looking for good things trains your attention away from the negative.",acts:["Name one thing I'm grateful for","Thank someone","Notice one good thing around me"]},
+ decide:{name:"Decide",col:"var(--tide)",why:"Making a decision, even an imperfect one, lowers worry and brings back a sense of control.",acts:["Make one decision I've been putting off","Pick tomorrow's top task","Choose a good-enough option and move on"]},
+ connect:{name:"Connect",col:"var(--social)",why:"Even brief contact with other people eases stress.",acts:["Message a friend","Hug someone or a pet","Say hello to a neighbor or coworker"]},
+ calm:{name:"Calm",col:"var(--coral-d)",why:"Slow breathing switches on your body's calming system.",acts:["Take 5 slow breaths","Relax my shoulders and jaw","Listen to a song I love"]},
+ sleep:{name:"Sleep",col:"var(--creative)",why:"A steady sleep rhythm makes everything else easier.",acts:["Set a bedtime for tonight","Plan no screens in bed tonight","Get up at my usual time"]},
+ goal:{name:"Tiny goal",col:"var(--lift)",why:"Small goals give your brain quick wins, which build motivation.",acts:["Set one tiny goal for today","Finish one small thing","Tidy one small spot"]}
+};
+const SP_MAX=15;let spJust=false;
+function spPoint(i){const t=i/(SP_MAX-1),a=t*Math.PI*2*3.2+Math.PI/2;return{x:180+105*Math.cos(a)*(0.75+0.25*t),y:270-t*220+22*Math.sin(a),front:Math.sin(a)>0}}
+function renderSpiral(){
+  const today=S.spiral[todayStr()]||[],n=today.length;
+  let path="";for(let i=0;i<=200;i++){const p=spPoint(i/200*(SP_MAX-1));path+=(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)}
+  let s=`<svg viewBox="0 0 360 300" role="img" aria-label="${n} of ${SP_MAX} steps up today's spiral"><path d="${path}" fill="none" stroke="var(--line)" stroke-width="10" stroke-linecap="round"/>`;
+  if(n>1){let lit="";const end=Math.min(n,SP_MAX)-1;for(let i=0;i<=end*14;i++){const p=spPoint(i/14);lit+=(i?"L":"M")+p.x.toFixed(1)+" "+p.y.toFixed(1)}s+=`<path d="${lit}" fill="none" stroke="var(--tide)" stroke-width="10" stroke-linecap="round" opacity=".35"/>`}
+  for(let i=0;i<SP_MAX;i++){const p=spPoint(i),e=today[i];
+    if(e)s+=`<circle cx="${p.x}" cy="${p.y}" r="9" fill="${SPIRAL[e.cat]?SPIRAL[e.cat].col:"var(--tide)"}" stroke="var(--surface)" stroke-width="2"${spJust&&i===n-1?' class="sp-new"':""}/>`;
+    else if(i===n)s+=`<circle cx="${p.x}" cy="${p.y}" r="9" fill="var(--surface)" stroke="var(--tide)" stroke-width="2.5" class="sp-next"/>`;
+    else s+=`<circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--surface)" stroke="var(--muted)" stroke-width="1.5"/>`}
+  s+=`<text x="12" y="24" font-size="13" fill="var(--ink)" font-family="JetBrains Mono,monospace">${Math.min(n,SP_MAX)} / ${SP_MAX}</text>`;
+  if(n>=SP_MAX)s+=`<text x="180" y="22" text-anchor="middle" font-size="14" fill="var(--tide)" font-family="Bricolage Grotesque,sans-serif" font-weight="700">Top of today's spiral</text>`;
+  $("sp-svg").innerHTML=s+"</svg>";spJust=false;
+  const box=$("sp-actions");box.innerHTML="";
+  Object.entries(SPIRAL).forEach(([k,c])=>{const d=document.createElement("div");d.className="spcat";d.innerHTML=`<div class="spname"><i style="background:${c.col}"></i>${c.name}</div>`;const r=document.createElement("div");r.className="row chips";
+    c.acts.forEach(a=>{const b=document.createElement("button");b.type="button";b.className="chip-btn";const cnt=today.filter(x=>x.label===a).length;b.textContent=(cnt?"✓ ":"")+a;b.onclick=()=>logSpiral(k,a);r.appendChild(b)});d.appendChild(r);box.appendChild(d)});
+  const week=[];for(let i=6;i>=0;i--){const d=addDays(todayStr(),-i);week.push([d,(S.spiral[d]||[]).length])}
+  const mx=Math.max(SP_MAX,...week.map(w=>w[1]));
+  $("sp-week").innerHTML=week.map(([d,c])=>`<div style="height:${Math.max(4,c/mx*100)}%" title="${d}: ${c}"></div>`).join("");
+  $("sp-labels").innerHTML=week.map(([d])=>`<span>${["Su","Mo","Tu","We","Th","Fr","Sa"][new Date(d+"T12:00").getDay()]}</span>`).join("");
+}
+function logSpiral(cat,label){
+  const t=todayStr();S.spiral[t]=S.spiral[t]||[];S.spiral[t].push({cat,label});
+  const keys=Object.keys(S.spiral).sort();while(keys.length>30)delete S.spiral[keys.shift()];
+  const n=S.spiral[t].length,c=SPIRAL[cat];spJust=true;
+  $("sp-msg").innerHTML=n===SP_MAX?"<strong>You reached the top of today's spiral.</strong> Anything more is a bonus.":`<strong>Step ${n}.</strong> ${c?c.why:"Every small action counts."}`;
+  commit();
+}
+$("sp-form").onsubmit=e=>{e.preventDefault();const v=$("sp-own").value.trim();if(!v)return;$("sp-own").value="";logSpiral("goal",v)};
+
 // ---------- wiring ----------
 document.getElementById("addform").onsubmit=e=>{
   e.preventDefault();const n=document.getElementById("t-name");if(!n.value.trim())return;
@@ -990,8 +1206,10 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
 });
 document.getElementById("today-label").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});
 function commit(){save();render()}
-function render(){drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF();renderGames()}
+function render(){if(!$("ideas").hidden)renderIdeas();drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF();renderGames()}
+if(S.examples){$("ideas").hidden=false;$("ideas-toggle").textContent="Hide task ideas"}
 render();
+if(S.dive)ensureDiveTimer();
 })();
 </script>
 
