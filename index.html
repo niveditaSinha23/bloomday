@@ -348,6 +348,22 @@ nav.tabs{border-top:1px solid var(--line);gap:4px;background:var(--surface)}
 #toast .tdot{width:8px;height:8px;border-radius:50%;background:var(--sun);flex:none}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
 @media (prefers-reduced-motion:reduce){.tile,.btn,.opt,.levelcard{transition:none}}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;background:var(--bg);flex-wrap:wrap}
+.segb{border:0;background:none;padding:6px 10px;border-radius:9px;font:600 13px var(--body);color:var(--muted);cursor:pointer}
+.segb.on{background:var(--surface);color:var(--tide);box-shadow:0 1px 3px rgba(36,26,69,.14)}
+.segb:focus-visible{outline:2px solid var(--sun);outline-offset:1px}
+.otag{display:block;font:700 10px var(--body);letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px}
+.otag.aff{color:var(--creative)}.otag.bal{color:var(--shallow)}
+.affcard{border-radius:18px;padding:18px;background:var(--tide-soft);background:linear-gradient(135deg,var(--tide-soft),var(--sun-soft));border:1px solid var(--line);display:grid;gap:8px}
+.affq{font:600 22px/1.35 var(--display);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.affcard.big{text-align:center;padding:28px 18px;justify-items:center}
+.affcard.big .affq{font-size:26px}
+.saydots{display:flex;gap:10px;justify-content:center}
+.saydots i{width:12px;height:12px;border-radius:50%;background:var(--surface);border:1px solid var(--tide);transition:background .3s,transform .3s}
+.saydots i.on{background:var(--tide);transform:scale(1.2)}
+.affrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow-wrap:anywhere}
+#today-aff{box-shadow:0 10px 28px -16px rgba(36,26,69,.18)}
 </style>
 </head>
 <body>
@@ -377,6 +393,8 @@ nav.tabs{border-top:1px solid var(--line);gap:4px;background:var(--surface)}
       <div class="eyebrow">Body basics · tap when done</div>
       <div class="row chips" id="basics"></div>
     </div>
+
+    <div class="affcard" id="today-aff" hidden></div>
 
     <div class="card">
       <div class="spread">
@@ -590,6 +608,7 @@ nav.tabs{border-top:1px solid var(--line);gap:4px;background:var(--surface)}
       <div><button class="btn" id="tf-next" hidden>Next card</button></div>
     </div>
       <div><button class="btn" id="tf-mode">Practice with example cards</button></div>
+      <div class="card"><div><div class="eyebrow">My affirmations</div><h2>Words you're growing into</h2></div><ul class="list" id="aff-deck"></ul></div>
       <div class="card"><h3>Your flips</h3><ul class="list" id="tf-hist"></ul></div>
     </div>
     <div class="game" id="g-breath" hidden>
@@ -738,7 +757,8 @@ function renderPlan(){
   const {out,left,low}=plan();const el=document.getElementById("plan");
   document.getElementById("lowtoggle").checked=low;
   const lb=document.getElementById("lowbat");lb.hidden=!low;
-  if(low&&S.proofs.length){const p=S.proofs[Math.floor(Math.random()*S.proofs.length)];document.getElementById("lowbat-proof").innerHTML=`<div class="proof"><time>${p.date} · a reminder from you</time>${esc(p.text)}</div>`}else document.getElementById("lowbat-proof").innerHTML="";
+  const ta=low?todaysAff():null;const affH=ta?`<div class="affcard"><span class="eyebrow">Your affirmation</span><p class="affq" style="font-size:19px">${esc(ta.said)}</p></div>`:"";
+  if(low&&S.proofs.length){const p=S.proofs[Math.floor(Math.random()*S.proofs.length)];document.getElementById("lowbat-proof").innerHTML=affH+`<div class="proof"><time>${p.date} · a reminder from you</time>${esc(p.text)}</div>`}else document.getElementById("lowbat-proof").innerHTML=affH;
   if(low)renderKit();
   if(!out.length){el.innerHTML=`<p class="note">${S.tasks.filter(t=>!t.done).length?"No time left today for these. Tomorrow is fine.":"All done or nothing planned. Enjoy the rest of your day."}</p>`;return}
   el.innerHTML=out.map(o=>`<div class="slot"><time>${fmt(o.c)}</time><div><div class="what"><strong>${esc(o.t.name)}</strong><span class="chip t-${o.t.tag}">${TAGS[o.t.tag]}</span></div><div class="fit">${o.t.dur} min · ${fitText(o.t,o.e)}</div></div></div>`).join("")+(left.length?`<p class="note">Didn't fit today: ${left.map(t=>esc(t.name)).join(", ")}. Moving them to tomorrow is a plan, not a failure.</p>`:"");
@@ -1084,7 +1104,7 @@ const LIFTS={
  catastrophe:["This is hard, but it's probably not the end of the story.","Even if the worst happened, I've coped with hard things before.","What's the most likely outcome, rather than the worst one?","I only need to handle today, one step at a time."],
  should:["I'd like to do better, and I can be gentle while I try.","I'm doing what I can with the energy I have.","There's no rule that says I must. I get to choose what matters.","Progress at my own pace is still progress."],
  fortune:["I can't see the future. It might go better than I fear.","I don't know how this ends yet.","I've been wrong about bad predictions before.","I can prepare for it instead of predicting it."],
- emotional:["I feel this strongly, but feelings aren't facts.","This feeling is real, and it will pass.","I can notice the feeling without obeying it.","Feeling scared doesn't mean something bad will happen."],
+ emotional:["I feel this strongly, but feelings aren't facts.","This feeling is real, and it will pass.","I can notice the feeling without obeying it.","Feeling bad right now doesn't mean everything is bad."],
  harsh:["This is a hard moment, not a hard life.","I can be kind to myself right now.","I've gotten through difficult days before.","I'd tell a friend who felt this to be gentle with themselves. I can tell myself the same.","It's okay to feel this. It won't feel this way forever."]
 };
 const BOOSTS=["This is proof I can do more than I think.","I want more days like this, so I'll notice what made it work.","I earned this, and I'm allowed to feel proud.","Small wins like this add up to big changes.","This is who I'm becoming.","I'll remember this the next time things feel hard.","Good things happen when I show up for myself.","I can build on this tomorrow."];
@@ -1113,19 +1133,89 @@ function classify(text){
   const trap=detectTrap(s);if(trap)n++;
   return {kind:n>p?"heavy":p>n?"good":"unsure",trap:trap||"harsh"};
 }
+// ---------- affirmations (in the spirit of You Can Heal Your Life) ----------
+// Each affirmation: [full, gentle]. Each theme also has bridge statements for when both feel too far away.
+const AFF={
+ worth:{name:"Self-worth",aff:[["I approve of myself.","I'm learning to approve of myself."],["I am enough, just as I am.","I'm learning that I am enough as I am."],["I deserve love and respect.","I'm beginning to believe I deserve love and respect."],["I accept myself completely.","I'm learning to accept myself, one day at a time."],["I am worthy of good things.","I'm opening up to the idea that I deserve good things."],["I love and appreciate who I am.","I'm finding things to appreciate about who I am."]],
+  bridge:["I'm open to the idea that I'm okay as I am.","Maybe I'm being harder on myself than I need to be.","I'm willing to see myself a little more kindly today."]},
+ work:{name:"Work and ability",aff:[["I am capable and I keep learning.","I'm becoming more capable every day."],["I bring real value to my work.","I'm learning to see the value I bring to my work."],["I trust myself to figure this out.","I'm learning to trust myself to figure things out."],["I do my work calmly and well.","I'm learning to work calmly, one step at a time."],["My skills grow every day.","My skills are growing, even when it's slow."],["I am proud of the effort I put in.","I'm allowed to notice the effort I put in."]],
+  bridge:["I'm willing to believe I can get better at this.","I've learned hard things before.","I don't have to be perfect to be good at my work."]},
+ mistakes:{name:"Mistakes and the past",aff:[["I forgive myself and I let the past go.","I'm learning to forgive myself."],["Every mistake helps me grow.","I'm learning to see mistakes as part of growing."],["I am doing my best, and my best is enough.","I'm doing my best with what I have today."],["I release the past and live in this moment.","I'm practising letting the past go."],["I learn and I move forward.","I'm willing to learn from this and move forward."]],
+  bridge:["I'm willing to stop punishing myself for this.","Everyone makes mistakes, including me.","I'm open to forgiving myself, a little at a time."]},
+ future:{name:"Worry about the future",aff:[["I am safe, and all is well.","In this moment, I am safe."],["I trust the process of life.","I'm learning to trust that things can work out."],["I can handle whatever comes.","I'm learning that I can cope with what comes."],["Good things are coming to me.","I'm open to good things coming my way."],["I meet the future with calm and courage.","I'm learning to meet the future one step at a time."]],
+  bridge:["I don't know how this ends, and it might go well.","Right now, in this moment, I'm okay.","I'm willing to worry a little less today."]},
+ body:{name:"Body",aff:[["I love and appreciate my body.","I'm learning to appreciate my body."],["My body carries me through every day.","I'm noticing what my body does for me."],["I treat my body with kindness.","I'm learning to treat my body more kindly."],["I am beautiful in my own way.","I'm open to seeing my own kind of beauty."],["I listen to my body and give it what it needs.","I'm learning to listen to what my body needs."]],
+  bridge:["I'm willing to speak about my body more gently.","My body is doing its best for me.","I can care for my body even on days I don't like it."]},
+ people:{name:"Relationships",aff:[["I am loved and I am lovable.","I'm learning that I am lovable."],["I attract kind and caring people.","I'm open to kind and caring people in my life."],["I give and receive love freely.","I'm learning to let love in."],["I am never truly alone.","I'm reaching out, and connection is possible."],["The right people value me.","I'm learning that the right people will value me."]],
+  bridge:["I'm open to the idea that some people care about me.","I have been a good friend to someone.","I'm willing to reach out to one person."]},
+ overwhelm:{name:"Overwhelm",aff:[["I do one thing at a time, calmly.","I'm learning to take one thing at a time."],["I have all the time I need.","I'm learning to slow down and breathe."],["I release what I cannot control.","I'm practising letting go of what I can't control."],["I am calm, centred and at peace.","I'm finding small moments of calm."],["It's okay to rest. Rest helps me.","I'm allowing myself a little rest."]],
+  bridge:["I only need to do the next small thing.","It's okay to not finish everything today.","I'm willing to take one slow breath right now."]},
+ general:{name:"Hard moment",aff:[["All is well in my world.","I'm learning that this moment will pass."],["I choose kind thoughts about myself.","I'm practising kinder thoughts about myself."],["I am at peace with myself.","I'm finding a little peace with myself."],["I approve of myself.","I'm learning to approve of myself."],["I am open to joy and ease.","I'm open to a little ease today."]],
+  bridge:["This is a hard moment, not a hard life.","I'm willing to be gentle with myself right now.","I've got through difficult days before."]}
+};
+const THEME_RE={
+ worth:/(not good enough|good enough|not enough|worthless|i'?m (a )?(failure|loser|nothing|nobody|fraud|disappointment)|i hate myself|unlovable|not worth|i'?m (so )?(stupid|dumb|useless|pathetic|an idiot|inadequate)|not smart|inferior|everyone is better|self worth)/,
+ body:/(my body|\bfat\b|ugly|weight|how i look|my looks|appearance|my skin|my face|too thin|too skinny|unattractive)/,
+ people:/(nobody|no one|alone|lonely|friends?|hates? me|don'?t like me|left me|rejected|ignored|my family|partner|relationship|loves? me|abandon|unwanted)/,
+ mistakes:/(mistake|mess(ed)? (it )?up|regret|should have|shouldn'?t have|my fault|blew it|screwed up|\bfailed\b|ruined|wasted|guilty|ashamed|embarrass)/,
+ overwhelm:/(too much|can'?t cope|overwhelm|so much to do|behind|exhausted|no time|drowning|can'?t handle|stressed|burn(ed|t)? out|tired of)/,
+ future:/(what if|going to|gonna|\bwill\b|won'?t|scared|afraid|anxious|anxiety|worried|worry|nervous|fear|future|tomorrow|go wrong|panic)/,
+ work:/(job|work|boss|manager|supervisor|career|deadline|project|exam|study|colleague|office|client|meeting|promotion|interview|performance|presentation|report)/
+};
+const THEME_ORDER=["worth","body","people","mistakes","overwhelm","future","work"];
+function detectTheme(text){
+  const s=" "+text.toLowerCase().replace(/[’‘]/g,"'")+" ";
+  let best="general",score=0;
+  THEME_ORDER.forEach(k=>{const m=s.match(new RegExp(THEME_RE[k].source,"g"));const n=m?m.length:0;if(n>score){score=n;best=k}});
+  return best;
+}
+function affCount(full){const a=(S.affs||[]).find(x=>x.full===full);return a?a.n:0}
+function pickAffs(theme,n,avoid=[]){
+  const list=AFF[theme].aff.filter(a=>!avoid.includes(a[0]));
+  const shuffled=pick(list,list.length);
+  const sig=AFF[theme].aff[0];const si=shuffled.indexOf(sig);if(si>0){shuffled.splice(si,1);shuffled.unshift(sig)}
+  shuffled.sort((a,b)=>affCount(b[0])-affCount(a[0]));
+  return shuffled.slice(0,n);
+}
+function saveAff(full,said){
+  S.affs=S.affs||[];let a=S.affs.find(x=>x.full===full);
+  if(!a){a={full,said,n:0,date:todayStr()};S.affs.unshift(a)}
+  a.n++;a.said=said;a.date=todayStr();
+}
+
 let tfo={step:"write",text:""};
 function flipFace(front,back,flipped,sunny){
   return `<div class="flipwrap"><div class="flipcard${flipped?" flipped":""}" id="tfo-card"><div class="face front${sunny?" sunny":""}">${front}</div><div class="face back${sunny?" sunny":""}">${back}</div></div></div>`;
 }
+const STYLES=[["mix","Mix"],["aff","Affirmations"],["bal","Balanced"]];
+function styleBar(){
+  const st=S.flipStyle||"mix";
+  return `<div class="seg" role="group" aria-label="Style of lifting thoughts">${STYLES.map(([k,l])=>`<button type="button" class="segb${k===st?" on":""}" data-st="${k}" aria-pressed="${k===st}">${l}</button>`).join("")}</div>`;
+}
+function wireStyle(){document.querySelectorAll(".segb").forEach(b=>b.onclick=()=>{S.flipStyle=b.dataset.st;save();tfo.opts=null;renderFlipOwn()})}
+function buildHeavyOpts(){
+  const st=S.flipStyle||"mix",th=tfo.theme;
+  const affs=pickAffs(th,st==="aff"?3:2).map(a=>({type:"aff",full:a[0],gentle:a[1]}));
+  const bal=(tfo.trap==="harsh"?pick(LIFTS.harsh,3):[...pick(LIFTS[tfo.trap],2),...pick(LIFTS.harsh,1)]).map(t=>({type:"bal",text:t}));
+  if(st==="aff")return affs;
+  if(st==="bal")return bal;
+  return [...affs,bal[0]];
+}
+function finishFlip(kind,result){
+  tfo.result=result;tfo.kind=kind;tfo.step="done";
+  S.flips=S.flips||[];S.flipTotal=(S.flipTotal||0)+1;
+  S.flips.unshift({date:todayStr(),kind,from:tfo.text,to:result});S.flips=S.flips.slice(0,50);commit();
+}
 function renderFlipOwn(){
   const el=$("tfo");
   if(tfo.step==="write"){
-    el.innerHTML=`<label class="f">What's on your mind? One sentence is enough.<textarea id="tfo-text" placeholder="e.g. I wasted the whole day and I'm so behind.">${esc(tfo.text)}</textarea></label><div class="row"><button class="btn primary" id="tfo-go">Flip it</button><span class="note">Heavy thoughts get lifted. Good thoughts get grown.</span></div>`;
+    el.innerHTML=`<label class="f">What's on your mind? One sentence is enough.<textarea id="tfo-text" placeholder="e.g. I'm not good enough for this.">${esc(tfo.text)}</textarea></label><div class="spread"><button class="btn primary" id="tfo-go">Flip it</button>${styleBar()}</div><p class="note" style="margin:0">Heavy thoughts get lifted with affirmations or balanced thoughts. Good thoughts get grown.</p>`;
+    wireStyle();
     $("tfo-text").oninput=e=>tfo.text=e.target.value;
     $("tfo-go").onclick=()=>{
       const t=$("tfo-text").value.trim();if(!t)return;tfo.text=t;
       if(CRISIS.test(t)){tfo.step="support";renderFlipOwn();return}
-      const c=classify(t);tfo.trap=c.trap;tfo.step=c.kind==="unsure"?"ask":c.kind;tfo.opts=null;renderFlipOwn();
+      const c=classify(t);tfo.trap=c.trap;tfo.theme=detectTheme(t);tfo.step=c.kind==="unsure"?"ask":c.kind;tfo.opts=null;renderFlipOwn();
     };
   }else if(tfo.step==="support"){
     el.innerHTML=`<div class="support"><strong>Thank you for writing that down. This sounds really heavy.</strong><span>This is more than a game can help with, and you deserve to talk to a real person. In India, Tele-MANAS is free and open 24/7: <span class="num">14416</span> or <span class="num">1-800-891-4416</span>. If you are in danger, call <span class="num">112</span>.</span><span>Outside India, your local emergency number or a crisis line can help.</span></div><div class="row"><button class="btn" id="tfo-reset">Back</button></div>`;
@@ -1134,32 +1224,74 @@ function renderFlipOwn(){
     el.innerHTML=`<div class="proof"><time>Your thought</time>${esc(tfo.text)}</div><h3>Is this thought weighing on you, or lifting you up?</h3><div class="row"><button class="btn" id="tfo-h">Weighing on me</button><button class="btn" id="tfo-g">Lifting me up</button><button class="btn" id="tfo-edit">Edit my thought</button></div>`;
     $("tfo-edit").onclick=()=>{tfo.step="write";renderFlipOwn()};
     $("tfo-h").onclick=()=>{tfo.step="heavy";renderFlipOwn()};$("tfo-g").onclick=()=>{tfo.step="good";renderFlipOwn()};
-  }else if(tfo.step==="heavy"||tfo.step==="good"){
-    const heavy=tfo.step==="heavy",T=TRAPS[tfo.trap];
-    if(!tfo.opts)tfo.opts=heavy?[...pick(LIFTS[tfo.trap],tfo.trap==="harsh"?3:2),...(tfo.trap==="harsh"?[]:pick(LIFTS.harsh,1))].sort(()=>Math.random()-.5):pick(BOOSTS,3);
-    if(heavy&&!tfo.cheer)tfo.cheer="";
-    if(!heavy&&!tfo.cheer)tfo.cheer=pick(CHEERS,1)[0];
-    const front=heavy?`<span class="eyebrow" style="color:inherit;opacity:.7">${tfo.trap==="harsh"?"A heavy thought":"Thinking trap: "+T.name}</span><div class="q">“${esc(tfo.text)}”</div>${tfo.trap!=="harsh"?`<div class="note" style="color:inherit;opacity:.75">${T.w}</div>`:""}`
-      :`<span class="eyebrow" style="color:inherit">A good thought</span><div class="q">“${esc(tfo.text)}”</div><div class="note" style="color:inherit">${tfo.cheer}</div>`;
-    el.innerHTML=flipFace(front,"",false,!heavy)+`<h3>${heavy?"Pick a thought that lifts this one":"Pick a way to grow it"}</h3><div class="opts" id="tfo-opts"></div><div class="ownrow"><input type="text" id="tfo-own" placeholder="${heavy?"Or write your own lifting thought":"Or add your own words"}" aria-label="Your own thought"><button class="btn" id="tfo-use">Use mine</button></div><div class="row"><button class="btn" id="tfo-shuffle">Show other options</button><button class="btn" id="tfo-switch">${heavy?"Actually, this is a good thought":"Actually, this one is weighing on me"}</button><button class="btn" id="tfo-edit">Edit my thought</button></div>`;
+  }else if(tfo.step==="heavy"){
+    const T=TRAPS[tfo.trap],A=AFF[tfo.theme];
+    if(!tfo.opts)tfo.opts=buildHeavyOpts();
+    const front=`<span class="eyebrow" style="color:inherit;opacity:.75">${A.name}${tfo.trap!=="harsh"?" · "+T.name:""}</span><div class="q">“${esc(tfo.text)}”</div>${tfo.trap!=="harsh"&&(S.flipStyle||"mix")!=="aff"?`<div class="note" style="color:inherit;opacity:.8">${T.w}</div>`:""}`;
+    el.innerHTML=flipFace(front,"",false,false)+`<div class="spread"><h3>Pick a thought that lifts this one</h3>${styleBar()}</div><div class="opts" id="tfo-opts"></div><div class="ownrow"><input type="text" id="tfo-own" placeholder="Or write your own affirmation" aria-label="Your own thought"><button class="btn" id="tfo-use">Use mine</button></div><div class="row"><button class="btn" id="tfo-shuffle">Show other options</button><button class="btn" id="tfo-switch">Actually, this is a good thought</button><button class="btn" id="tfo-edit">Edit my thought</button></div>`;
+    wireStyle();
+    tfo.opts.forEach(o=>{const b=document.createElement("button");b.className="opt";b.innerHTML=`<span class="otag ${o.type}">${o.type==="aff"?"Affirmation":"Balanced"}</span>${esc(o.type==="aff"?o.full:o.text)}`;
+      b.onclick=()=>{if(o.type==="aff"){tfo.aff=o;tfo.step="believe";renderFlipOwn()}else finishFlip("heavy",o.text)};$("tfo-opts").appendChild(b)});
+    $("tfo-use").onclick=()=>{const v=$("tfo-own").value.trim();if(!v)return;tfo.aff={type:"aff",full:v,gentle:"I'm learning to believe: "+v.charAt(0).toLowerCase()+v.slice(1),own:true};tfo.say=v;tfo.count=0;tfo.step="say";renderFlipOwn()};
+    $("tfo-shuffle").onclick=()=>{const old=tfo.opts.map(o=>o.full||o.text);let n=buildHeavyOpts();n=n.filter(o=>!old.includes(o.full||o.text)).concat(n).slice(0,tfo.opts.length);tfo.opts=n;renderFlipOwn()};
+    $("tfo-switch").onclick=()=>{tfo.step="good";tfo.opts=null;tfo.cheer=null;renderFlipOwn()};
+    $("tfo-edit").onclick=()=>{tfo.step="write";tfo.opts=null;renderFlipOwn()};
+  }else if(tfo.step==="believe"){
+    el.innerHTML=`<div class="affcard"><span class="eyebrow">Your affirmation</span><p class="affq">${esc(tfo.aff.full)}</p></div><h3>Read it once, slowly. How true does it feel right now?</h3><div class="scale" id="tfo-scale" role="group" aria-label="How true it feels"></div><p class="note" style="margin:0">There's no wrong answer. If it feels far away, we'll find a version you can hold today.</p>`;
+    buildScale("tfo-scale",["Not at all","A little","Somewhat","Mostly","Fully"],v=>{
+      if(v>=3){tfo.say=tfo.aff.full;tfo.count=0;tfo.step="say"}else{tfo.level=v;tfo.step="soften"}renderFlipOwn()});
+  }else if(tfo.step==="soften"){
+    const bridges=pick(AFF[tfo.theme].bridge,1);
+    const softer=tfo.level===2?tfo.aff.gentle:bridges[0];
+    el.innerHTML=`<div class="affcard"><span class="eyebrow">A gentler version</span><p class="affq">${esc(softer)}</p></div><p style="margin:0">That's completely okay. A softer step still moves you toward <em>“${esc(tfo.aff.full)}”</em> Big affirmations land better once the smaller ones feel true.</p><div class="row"><button class="btn primary" id="tfo-soft">Use the gentler version</button><button class="btn" id="tfo-full">Keep the full one</button></div>`;
+    $("tfo-soft").onclick=()=>{tfo.say=softer;tfo.count=0;tfo.step="say";renderFlipOwn()};
+    $("tfo-full").onclick=()=>{tfo.say=tfo.aff.full;tfo.count=0;tfo.step="say";renderFlipOwn()};
+  }else if(tfo.step==="say"){
+    const c=tfo.count||0;
+    el.innerHTML=`<div class="affcard big"><span class="eyebrow">Say it out loud, three times</span><p class="affq">${esc(tfo.say)}</p><div class="saydots" aria-label="${c} of 3 said">${[0,1,2].map(i=>`<i class="${i<c?"on":""}"></i>`).join("")}</div></div><p class="note" style="margin:0">Say it slowly and mean it as much as you can. If there's a mirror nearby, look yourself in the eyes while you say it.</p><div class="row"><button class="btn primary" id="tfo-said">${c===0?"I said it":c===1?"Said it twice":"Said it three times"}</button><button class="btn" id="tfo-skip">Skip</button></div>`;
+    const fin=()=>{saveAff(tfo.aff.full,tfo.say);finishFlip("affirm",tfo.say)};
+    $("tfo-said").onclick=()=>{tfo.count=c+1;if(tfo.count>=3)fin();else renderFlipOwn()};
+    $("tfo-skip").onclick=fin;
+  }else if(tfo.step==="good"){
+    if(!tfo.opts)tfo.opts=pick(BOOSTS,3);
+    if(!tfo.cheer)tfo.cheer=pick(CHEERS,1)[0];
+    const front=`<span class="eyebrow" style="color:inherit">A good thought</span><div class="q">“${esc(tfo.text)}”</div><div class="note" style="color:inherit">${tfo.cheer}</div>`;
+    el.innerHTML=flipFace(front,"",false,true)+`<h3>Pick a way to grow it</h3><div class="opts" id="tfo-opts"></div><div class="ownrow"><input type="text" id="tfo-own" placeholder="Or add your own words" aria-label="Your own words"><button class="btn" id="tfo-use">Use mine</button></div><div class="row"><button class="btn" id="tfo-shuffle">Show other options</button><button class="btn" id="tfo-switch">Actually, this one is weighing on me</button><button class="btn" id="tfo-edit">Edit my thought</button></div>`;
+    tfo.opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>finishFlip("good",t);$("tfo-opts").appendChild(b)});
+    $("tfo-use").onclick=()=>{const v=$("tfo-own").value.trim();if(v)finishFlip("good",v)};
+    $("tfo-shuffle").onclick=()=>{tfo.opts=pick(BOOSTS,3,tfo.opts);renderFlipOwn()};
+    $("tfo-switch").onclick=()=>{tfo.step="heavy";tfo.opts=null;renderFlipOwn()};
     $("tfo-edit").onclick=()=>{tfo.step="write";tfo.opts=null;tfo.cheer=null;renderFlipOwn()};
-    const done=t=>{tfo.result=t;tfo.kind=heavy?"heavy":"good";tfo.step="done";S.flips=S.flips||[];S.flipTotal=(S.flipTotal||0)+1;S.flips.unshift({date:todayStr(),kind:tfo.kind,from:tfo.text,to:t});S.flips=S.flips.slice(0,50);commit()};
-    tfo.opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>done(t);$("tfo-opts").appendChild(b)});
-    $("tfo-use").onclick=()=>{const v=$("tfo-own").value.trim();if(v)done(v)};
-    $("tfo-shuffle").onclick=()=>{tfo.opts=heavy?pick(tfo.trap==="harsh"?LIFTS.harsh:LIFTS[tfo.trap].concat(LIFTS.harsh),3,tfo.opts):pick(BOOSTS,3,tfo.opts);renderFlipOwn()};
-    $("tfo-switch").onclick=()=>{tfo.step=heavy?"good":"heavy";tfo.opts=null;tfo.cheer=null;renderFlipOwn()};
   }else if(tfo.step==="done"){
-    const heavy=tfo.kind==="heavy",T=TRAPS[tfo.trap];
-    const front=heavy?`<span class="eyebrow" style="color:inherit;opacity:.7">Heavy thought</span><div class="q">“${esc(tfo.text)}”</div>`:`<span class="eyebrow" style="color:inherit">A good thought</span><div class="q">“${esc(tfo.text)}”</div>`;
-    const back=heavy?`<span class="eyebrow">Lifted</span><div class="q">“${esc(tfo.result)}”</div><div class="note" style="color:inherit;text-decoration:line-through;opacity:.6">${esc(tfo.text)}</div>`
-      :`<span class="eyebrow">Grown</span><div class="q">“${esc(tfo.text)}”</div><div class="q" style="font-size:17px">${esc(tfo.result)}</div>`;
-    el.innerHTML=flipFace(front,back,false,!heavy)+`<p class="feedback" style="margin:0">${heavy?"Read the lifted thought slowly, once more. You don't have to fully believe it yet. Making room for it is enough.":"Keep this one. On a low day, Bloomday can remind you of it."}</p><div class="row">${heavy?"":`<button class="btn primary" id="tfo-proof">Save to Proof of me</button>`}<button class="btn${heavy?" primary":""}" id="tfo-again">Flip another thought</button></div><span class="note" id="tfo-msg" role="status"></span>`;
+    const k=tfo.kind;
+    const front=k==="good"?`<span class="eyebrow" style="color:inherit">A good thought</span><div class="q">“${esc(tfo.text)}”</div>`:`<span class="eyebrow" style="color:inherit;opacity:.75">Heavy thought</span><div class="q">“${esc(tfo.text)}”</div>`;
+    const back=k==="good"?`<span class="eyebrow">Grown</span><div class="q">“${esc(tfo.text)}”</div><div class="q" style="font-size:17px">${esc(tfo.result)}</div>`
+      :`<span class="eyebrow">${k==="affirm"?"Affirmed":"Lifted"}</span><div class="q">“${esc(tfo.result)}”</div><div class="note" style="color:inherit;text-decoration:line-through;opacity:.6">${esc(tfo.text)}</div>`;
+    const msg=k==="affirm"?"Saved to My affirmations. Bloomday will show it to you on the Today tab, and on hard days.":k==="heavy"?"Read the lifted thought slowly, once more. You don't have to fully believe it yet. Making room for it is enough.":"Keep this one. On a low day, Bloomday can remind you of it.";
+    el.innerHTML=flipFace(front,back,false,k==="good")+`<p class="feedback" style="margin:0">${msg}</p><div class="row">${k==="good"?`<button class="btn primary" id="tfo-proof">Save to Proof of me</button>`:""}<button class="btn${k!=="good"?" primary":""}" id="tfo-again">Flip another thought</button></div><span class="note" id="tfo-msg" role="status"></span>`;
     requestAnimationFrame(()=>requestAnimationFrame(()=>{const c=$("tfo-card");if(c)c.classList.add("flipped")}));
     const pb=$("tfo-proof");if(pb)pb.onclick=()=>{S.proofs.unshift({date:todayStr(),q:"Thought Flip",text:tfo.text});pb.disabled=true;pb.textContent="Saved";save();$("tfo-msg").textContent="It's in Proof of me, ready for a low day."};
     $("tfo-again").onclick=()=>{tfo={step:"write",text:""};renderFlipOwn()};
   }
+  renderAffDeck();
   const h=$("tf-hist");
-  h.innerHTML=(S.flips||[]).length?S.flips.slice(0,8).map(f=>`<li class="proof"><time>${f.date} · ${f.kind==="heavy"?"Lifted":"Grown"}</time><span style="color:var(--muted)">${esc(f.from)}</span><br>${esc(f.to)}</li>`).join(""):'<li class="note">Your flipped thoughts collect here.</li>';
+  const KL={heavy:"Lifted",good:"Grown",affirm:"Affirmed"};
+  h.innerHTML=(S.flips||[]).length?S.flips.slice(0,8).map(f=>`<li class="proof"><time>${f.date} · ${KL[f.kind]||"Flipped"}</time><span style="color:var(--muted)">${esc(f.from)}</span><br>${esc(f.to)}</li>`).join(""):'<li class="note">Your flipped thoughts collect here.</li>';
+}
+function renderAffDeck(){
+  const ul=$("aff-deck");if(!ul)return;const list=S.affs||[];
+  ul.innerHTML=list.length?"":'<li class="note">Affirmations you say three times are saved here. One shows up on your Today tab each day.</li>';
+  list.slice(0,20).forEach(a=>{const li=document.createElement("li");li.className="affrow";li.innerHTML=`<div><strong>${esc(a.said)}</strong>${a.said!==a.full?`<div class="fit">Working toward: ${esc(a.full)}</div>`:""}<div class="fit">Chosen ${plural(a.n,"time")}</div></div><button class="icon-btn" aria-label="Remove affirmation">×</button>`;
+    li.querySelector("button").onclick=()=>{S.affs=S.affs.filter(x=>x!==a);commit()};ul.appendChild(li)});
+}
+// today card
+function todaysAff(){const l=S.affs||[];if(!l.length)return null;return l[Math.floor(Date.now()/864e5)%l.length]}
+function renderTodayAff(){
+  const a=todaysAff(),box=$("today-aff");if(!box)return;box.hidden=!a;if(!a)return;
+  const said=(S.affDays||[]).includes(todayStr());
+  box.innerHTML=`<span class="eyebrow">Today's affirmation</span><p class="affq">${esc(a.said)}</p><div class="row"><button class="btn${said?"":" primary"}" id="ta-said"${said?" disabled":""}>${said?"Said it today ✓":"I said it three times"}</button><button class="btn" id="ta-new">Write a new one</button></div>`;
+  if(!said)$("ta-said").onclick=()=>{S.affDays=S.affDays||[];S.affDays.push(todayStr());S.affDays=S.affDays.slice(-120);commit()};
+  $("ta-new").onclick=()=>goGame("flip");
 }
 $("tf-mode").onclick=()=>{const own=!$("tf-own").hidden;$("tf-own").hidden=own;$("tf-deckcard").hidden=!own;$("tf-mode").textContent=own?"Write my own thought":"Practice with example cards"};
 
@@ -1326,7 +1458,7 @@ function petalCount(){
   let p=S.checkins.length*5+S.tasks.filter(t=>t.done&&!S.examples).length*10+S.proofs.length*5;
   S.habits.forEach(h=>p+=Object.values(h.days).filter(Boolean).length*5);
   p+=S.flipTotal*5+S.diveMins+S.spiralTotal*2+Object.values(S.ladder).reduce((a,b)=>a+b,0)*5;
-  p+=S.releases*5+S.cases.length*10+S.breaths*5+Object.keys(S.weeks).length*10;
+  p+=S.releases*5+S.cases.length*10+S.breaths*5+Object.keys(S.weeks).length*10+(S.affDays||[]).length*3;
   return p;
 }
 const LV=[[0,"Seed"],[60,"Sprout"],[160,"Bud"],[320,"Bloom"],[550,"Blossom"],[850,"Flower patch"],[1250,"Garden"],[1800,"Meadow"],[2500,"Wildflower field"]];
@@ -1346,6 +1478,7 @@ const BADGES=[
  {id:"g5",name:"Lighter",d:"Let go 5 times",g:"let",c:"var(--sun)",t:()=>S.releases>=5},
  {id:"f10",name:"Thought flipper",d:"10 thoughts flipped",g:"flip",c:"var(--creative)",t:()=>S.flipTotal>=10},
  {id:"b5",name:"Calm breather",d:"5 breathing rounds",g:"breath",c:"var(--coral-d)",t:()=>S.breaths>=5},
+ {id:"a7",name:"Self-approval",d:"Said an affirmation on 7 days",g:"heart",c:"var(--coral-c)",t:()=>(S.affDays||[]).length>=7},
  {id:"lv3",name:"In bloom",d:"Reached Bloom level",g:"flower",c:"var(--creative)",t:()=>levelOf(petalCount()).i>=3}
 ];
 const EXTRA_GLYPH={
@@ -1429,7 +1562,7 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
 });
 document.getElementById("today-label").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});
 function commit(){save();render();celebrate()}
-function render(){renderLevel();renderBadges();if(!$("ideas").hidden)renderIdeas();drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF();renderGames()}
+function render(){renderLevel();renderTodayAff();renderBadges();if(!$("ideas").hidden)renderIdeas();drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF();renderGames()}
 if(!S.tasks.length){$("ideas").hidden=false;$("ideas-toggle").textContent="Hide task ideas"}
 $("logo").innerHTML=MARK();
 render();celebrate();
