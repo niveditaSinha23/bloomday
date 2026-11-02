@@ -21,7 +21,7 @@ img{max-width:100%}
 [hidden]{display:none!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: one column, chunky game-like cards, bottom tab bar with colored icons; petals + levels in the header */
 :root{
@@ -31,8 +31,8 @@ img{max-width:100%}
   --alert-bg:#FFE8EE; --alert-ink:#B4234F;
   --sea:#CFF1FF; --sea-deep:#7FD3F2; --sand:#FFE3A8; --paper:#FFF6DE;
   --coral-a:#FF5C8A; --coral-b:#FFB020; --coral-c:#8B5CF6; --coral-d:#16B89A;
-  --display:"Lilita One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
-  --body:"Nunito", "Segoe UI", system-ui, sans-serif;
+  --display:"Sora", "Segoe UI", system-ui, sans-serif;
+  --body:"Manrope", "Segoe UI", system-ui, sans-serif;
   --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -240,98 +240,114 @@ svg.reef{width:100%;height:auto;display:block;border-radius:12px}
 footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.flipcard,.balloon,.balloon.float{transition:none}}
 
-/* ===== Bloomday playful theme layer ===== */
-body{font:16px/1.55 var(--body);background:var(--bg);background-image:radial-gradient(circle at 12% -4%, var(--tide-soft) 0, transparent 38%),radial-gradient(circle at 100% 18%, var(--sun-soft) 0, transparent 30%);background-attachment:fixed}
-.wrap{padding-block:18px 110px}
+/* ===== Bloomday refined theme layer ===== */
+body{font:15px/1.6 var(--body);background:var(--bg);background-image:radial-gradient(1200px 420px at 10% -10%, var(--tide-soft) 0, transparent 60%);background-attachment:fixed}
+.wrap{padding-block:20px 110px}
 header.top{align-items:center}
 .brand{display:flex;align-items:center;gap:10px}
-.logo{width:48px;height:48px;animation:spin 18s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-h1{font:400 34px/1 var(--display);letter-spacing:.01em;color:var(--tide)}
-.date{font:700 13px var(--body);color:var(--muted);margin-top:2px}
-.lede{font-weight:600;margin-top:10px}
-h2{font:400 24px/1.15 var(--display);letter-spacing:.01em}
-h3{font:800 16px/1.3 var(--body)}
-.eyebrow{font:800 11px/1.35 var(--body);letter-spacing:.1em;color:var(--tide)}
+.logo{width:40px;height:40px}
+h1{font:700 26px/1.05 var(--display);letter-spacing:-.025em;color:var(--ink)}
+.date{font:500 13px var(--body);color:var(--muted);margin-top:3px}
+.lede{font-weight:500;margin-top:10px}
+h2{font:600 21px/1.2 var(--display);letter-spacing:-.015em}
+h3{font:700 15px/1.3 var(--body)}
+.eyebrow{font:700 11px/1.35 var(--body);letter-spacing:.09em;color:var(--tide)}
 .note{color:var(--muted)}
-.levelcard{border:2px solid var(--tide-dark);background:var(--tide);color:var(--on-accent);border-radius:18px;padding:8px 12px;display:grid;gap:5px;min-width:170px;text-align:left;cursor:pointer;box-shadow:0 5px 0 var(--tide-dark);font:inherit;transition:transform .1s}
-.levelcard:hover{transform:translateY(-2px)}
-.levelcard .lv{display:flex;justify-content:space-between;gap:8px;font:400 17px/1 var(--display)}
-.levelcard .lvn{font:900 12px var(--body);background:var(--on-accent);color:var(--tide);border-radius:999px;padding:2px 8px}
-.lvbar{height:10px;border-radius:999px;background:rgba(255,255,255,.28);overflow:hidden;display:block}
-.lvbar span{display:block;height:100%;background:var(--sun);border-radius:999px;transition:width .6s cubic-bezier(.3,1.4,.6,1)}
-.lvpts{font:700 11px var(--body);opacity:.92}
-section.panel{gap:20px}
-.card{border:2px solid var(--line);border-radius:24px;box-shadow:0 6px 0 var(--edge);padding:20px}
-.btn{border:2px solid var(--line);border-radius:14px;padding:9px 16px;font-weight:800;box-shadow:0 4px 0 var(--edge);transition:transform .08s,box-shadow .08s,border-color .15s;background:var(--surface)}
-.btn:hover{border-color:var(--tide)}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--edge)}
-.btn.primary{background:var(--tide);border-color:var(--tide-dark);color:var(--on-accent);box-shadow:0 4px 0 var(--tide-dark)}
-.btn.primary:active{box-shadow:0 1px 0 var(--tide-dark)}
-.btn:disabled{opacity:.55;transform:none;box-shadow:0 2px 0 var(--edge);cursor:default}
-input[type=text],input[type=number],input[type=time],select,textarea{border:2px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--bg);font-weight:600}
-input:focus,select:focus,textarea:focus{border-color:var(--tide);outline:none}
-.chip-btn{border:2px solid var(--line);border-radius:999px;font-weight:700;padding:5px 12px;background:var(--surface);color:var(--ink)}
-.chip-btn:hover{border-color:var(--tide);border-style:solid}
-.chip-btn.on{background:var(--tide);border-color:var(--tide-dark);color:var(--on-accent)}
-.chip{border:0;font:800 10px/1.5 var(--body);letter-spacing:.06em;padding:3px 9px;color:var(--on-accent)}
-.chip.t-deep{background:var(--deep)}.chip.t-creative{background:var(--creative)}.chip.t-social{background:var(--social)}.chip.t-shallow{background:var(--shallow)}.chip.t-lift{background:var(--lift)}
-.task,.habit{border:2px solid var(--line);border-radius:16px;background:var(--surface)}
-.task input[type=checkbox]{width:22px;height:22px;accent-color:var(--lift)}
-.proof{border-left:4px solid var(--sun);border-radius:4px 14px 14px 4px}
-.opt{border:2px solid var(--line);border-radius:14px;box-shadow:0 3px 0 var(--edge);font-weight:700;background:var(--surface);transition:transform .1s,border-color .15s}
-.opt:hover{border-color:var(--tide);transform:translateY(-2px)}
-.scale button{border:2px solid var(--line);border-radius:16px;box-shadow:0 3px 0 var(--edge);background:var(--surface);font-weight:700}
-.scale button b{font:400 24px var(--display);color:var(--tide)}
-.scale button[aria-pressed="true"]{background:var(--tide);border-color:var(--tide-dark);color:var(--on-accent)}
-.scale button[aria-pressed="true"] b{color:var(--on-accent)}
-.banner{border:2px solid var(--sun);box-shadow:0 5px 0 var(--sun);border-radius:20px}
-.example{background:var(--sun);color:#241A45;font:800 11px var(--body);border-radius:999px;padding:3px 10px}
-.toggle{font-weight:800}
-.prompt,.say{font:800 22px/1.35 var(--body)}
-.face{border-radius:22px}
-.face .q{font:800 21px/1.35 var(--body)}
+.levelcard{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:16px;padding:10px 14px;display:grid;gap:6px;min-width:190px;text-align:left;cursor:pointer;font:inherit;box-shadow:0 1px 2px rgba(36,26,69,.05);transition:border-color .15s}
+.levelcard:hover{border-color:var(--tide)}
+.levelcard .lv{display:flex;justify-content:space-between;align-items:center;gap:8px;font:600 15px/1 var(--display)}
+.levelcard .lvn{font:700 11px var(--body);background:var(--tide-soft);color:var(--tide);border-radius:999px;padding:3px 8px}
+.lvbar{height:6px;border-radius:999px;background:var(--line);overflow:hidden;display:block}
+.lvbar span{display:block;height:100%;background:linear-gradient(90deg,var(--tide),var(--creative));border-radius:999px;transition:width .6s ease}
+.lvpts{font:500 11px var(--body);color:var(--muted)}
+.lvpts b{color:var(--ink)}
+section.panel{gap:18px}
+.card{border:1px solid var(--line);border-radius:20px;box-shadow:0 1px 2px rgba(36,26,69,.04),0 10px 28px -16px rgba(36,26,69,.18);padding:20px}
+.btn{border:1px solid var(--line);border-radius:12px;padding:9px 16px;font-weight:600;box-shadow:none;background:var(--surface);transition:background .15s,border-color .15s}
+.btn:hover{border-color:var(--tide);background:var(--tide-soft)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--tide);border-color:var(--tide);color:var(--on-accent)}
+.btn.primary:hover{background:var(--tide-dark);border-color:var(--tide-dark)}
+.btn:disabled{opacity:.55;transform:none;cursor:default}
+input[type=text],input[type=number],input[type=time],select,textarea{border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--bg);font-weight:500}
+input:focus,select:focus,textarea:focus{border-color:var(--tide);outline:2px solid var(--tide-soft);outline-offset:0}
+.chip-btn{border:1px solid var(--line);border-radius:999px;font-weight:600;padding:5px 12px;background:var(--surface);color:var(--ink);font-size:13px}
+.chip-btn:hover{border-color:var(--tide);border-style:solid;background:var(--tide-soft)}
+.chip-btn.on{background:var(--tide);border-color:var(--tide);color:var(--on-accent)}
+.chip{border:0;font:700 10px/1.6 var(--body);letter-spacing:.06em;padding:2px 8px}
+.chip.t-deep{color:var(--deep);background:var(--tide-soft);background:color-mix(in srgb,var(--deep) 13%,transparent)}
+.chip.t-creative{color:var(--creative);background:var(--tide-soft);background:color-mix(in srgb,var(--creative) 13%,transparent)}
+.chip.t-social{color:var(--social);background:var(--tide-soft);background:color-mix(in srgb,var(--social) 13%,transparent)}
+.chip.t-shallow{color:var(--shallow);background:var(--tide-soft);background:color-mix(in srgb,var(--shallow) 13%,transparent)}
+.chip.t-lift{color:var(--lift);background:var(--tide-soft);background:color-mix(in srgb,var(--lift) 13%,transparent)}
+.task,.habit{border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.task input[type=checkbox]{width:20px;height:20px;accent-color:var(--tide)}
+.task .name{cursor:text}
+.task .name:hover .nm{text-decoration:underline dotted var(--muted);text-underline-offset:3px}
+.task .name input{width:100%;font:inherit;padding:4px 8px}
+.proof{border-left:3px solid var(--tide);border-radius:4px 12px 12px 4px}
+.opt{border:1px solid var(--line);border-radius:12px;box-shadow:none;font-weight:500;background:var(--surface);transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--tide);background:var(--tide-soft)}
+.scale button{border:1px solid var(--line);border-radius:12px;box-shadow:none;background:var(--surface);font-weight:500}
+.scale button b{font:600 20px var(--display);color:var(--ink)}
+.scale button[aria-pressed="true"]{background:var(--tide-soft);border-color:var(--tide);color:var(--ink)}
+.scale button[aria-pressed="true"] b{color:var(--tide)}
+.banner{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:18px;gap:12px;box-shadow:0 10px 28px -16px rgba(36,26,69,.18);border-top:4px solid var(--sun)}
+.toggle{font-weight:600}
+.prompt,.say{font:600 21px/1.35 var(--display);letter-spacing:-.01em}
+.face{border-radius:20px}
+.face .q{font:600 19px/1.4 var(--display);letter-spacing:-.01em}
 .face.front{background:var(--tide);color:var(--on-accent)}
-.face.back{background:var(--lift);color:var(--on-accent)}
-.face.front.sunny{background:var(--sun-soft);color:var(--ink);border:3px solid var(--sun)}
+.face.back{background:var(--tide-soft);color:var(--ink);border:1px solid var(--tide)}
+.face.front.sunny{background:var(--sun-soft);color:var(--ink);border:1px solid var(--sun)}
 .face.back.sunny{background:var(--sun);color:#241A45}
 .face .eyebrow,.face .note{color:inherit}
-.bigclock{font:400 40px/1 var(--display);color:var(--tide)}
-.case-title{font:400 21px/1.2 var(--display)}
-.casefile,.casebtn{border:2px solid var(--line);box-shadow:0 4px 0 var(--edge)}
-.stamp{font:900 13px var(--body)}
-.rung{border:2px solid var(--line);font-weight:700}
+.bigclock{font:600 38px/1 var(--display);color:var(--tide);letter-spacing:-.02em}
+.case-title{font:600 19px/1.25 var(--display)}
+.casefile,.casebtn{border:1px solid var(--line)}
+.stamp{font:800 12px var(--body)}
+.rung{border:1px solid var(--line);font-weight:500}
 .rung.cur{border-color:var(--coral-c);background:var(--tide-soft)}
-.sky,svg.reef,.ocean svg{border-radius:20px}
-.pill{font:800 12px var(--body);background:var(--tide-soft);color:var(--tide);border-radius:999px;padding:4px 10px}
+.sky,svg.reef,.ocean svg{border-radius:16px}
+.pill{font:700 12px var(--body);background:var(--tide-soft);color:var(--tide);border-radius:999px;padding:4px 10px}
 /* hub */
-.hub{gap:14px}
-.tile{border:2px solid var(--line);border-radius:22px;box-shadow:0 6px 0 var(--edge);transition:transform .12s,border-color .15s;padding:16px;gap:8px}
-.tile:hover{transform:translateY(-3px);border-color:var(--tc)}
-.tile:active{transform:translateY(2px);box-shadow:0 2px 0 var(--edge)}
-.tglyph{width:60px;height:60px;border-radius:18px;background:var(--tide-soft);background:color-mix(in srgb,var(--tc) 20%,var(--surface));display:grid;place-items:center}
-.tglyph svg{width:42px;height:42px}
-.tile h3{font:400 19px/1.15 var(--display)}
-.tile .meta{font:800 10px var(--body);letter-spacing:.06em}
+.hub{gap:12px}
+.tile{border:1px solid var(--line);border-radius:18px;box-shadow:0 1px 2px rgba(36,26,69,.04);transition:transform .15s,border-color .15s,box-shadow .15s;padding:16px;gap:8px}
+.tile:hover{transform:translateY(-2px);border-color:var(--tc);box-shadow:0 12px 24px -16px rgba(36,26,69,.3)}
+.tglyph{width:56px;height:56px;border-radius:16px;background:var(--tide-soft);background:color-mix(in srgb,var(--tc) 16%,var(--surface));display:grid;place-items:center}
+.tglyph svg{width:40px;height:40px}
+.tile h3{font:600 16px/1.2 var(--display);letter-spacing:-.01em}
+.tile .meta{font:700 10px var(--body);letter-spacing:.06em}
 .tile .meta b{color:var(--tc)}
 /* tabs */
-nav.tabs{border-top:2px solid var(--line);gap:6px}
-.tab{font-weight:800;font-size:12px;border-radius:16px;padding:6px 12px;gap:2px;min-width:70px;transition:transform .1s}
-.tab svg{width:24px;height:24px}
-.tab[aria-selected="true"]{color:var(--on-accent);background:var(--tc,var(--tide));transform:translateY(-3px);box-shadow:0 4px 0 var(--edge)}
+nav.tabs{border-top:1px solid var(--line);gap:4px;background:var(--surface)}
+.tab{font-weight:600;font-size:12px;border-radius:12px;padding:6px 12px;gap:3px;min-width:72px}
+.tab svg{width:22px;height:22px}
+.tab[aria-selected="true"]{color:var(--tc);background:var(--tide-soft);background:color-mix(in srgb,var(--tc) 12%,transparent)}
 .tab[data-p="today"]{--tc:var(--tide)}.tab[data-p="check"]{--tc:var(--creative)}.tab[data-p="reflect"]{--tc:var(--social)}.tab[data-p="games"]{--tc:var(--lift)}
 /* badges */
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:14px 10px}
-.badge{display:grid;justify-items:center;text-align:center;gap:3px;font-size:12px;font-weight:800;line-height:1.25}
-.badge svg{width:60px;height:60px}
-.badge small{font-weight:600;color:var(--muted);font-size:11px}
-.badge.locked svg{opacity:.45;filter:grayscale(1)}
+.badge{display:grid;justify-items:center;text-align:center;gap:3px;font-size:12px;font-weight:700;line-height:1.25}
+.badge svg{width:56px;height:56px}
+.badge small{font-weight:500;color:var(--muted);font-size:11px}
+.badge.locked svg{opacity:.4;filter:grayscale(1)}
 .badge.locked span{color:var(--muted)}
+/* low battery kit */
+.kit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:380px){.kit{grid-template-columns:1fr}}
+.kitbtn{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:10px;cursor:pointer;font:inherit;color:inherit;min-width:0}
+.kitbtn:hover{border-color:var(--tc)}
+.kitbtn .tglyph{width:40px;height:40px;border-radius:12px;flex:none}
+.kitbtn .tglyph svg{width:28px;height:28px}
+.kitbtn b{display:block;font-size:14px}
+.kitbtn small{color:var(--muted);font-size:12px}
+.lowhelp{font-size:13px;color:var(--muted);margin:0}
 /* toast + confetti */
-#toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:800;z-index:40;transition:opacity .25s,transform .25s;pointer-events:none;display:flex;gap:8px;align-items:center;max-width:calc(100% - 32px);box-shadow:0 6px 18px rgba(36,26,69,.25)}
+#toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);opacity:0;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:600;font-size:14px;z-index:40;transition:opacity .25s,transform .25s;pointer-events:none;display:flex;gap:8px;align-items:center;max-width:calc(100% - 32px);box-shadow:0 8px 20px rgba(36,26,69,.22)}
 #toast.show{opacity:1;transform:translate(-50%,0)}
+#toast .tdot{width:8px;height:8px;border-radius:50%;background:var(--sun);flex:none}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
-@media (prefers-reduced-motion:reduce){.logo{animation:none}.tile,.btn,.opt,.tab,.levelcard{transition:none}}
+@media (prefers-reduced-motion:reduce){.tile,.btn,.opt,.levelcard{transition:none}}
 </style>
 </head>
 <body>
@@ -354,8 +370,12 @@ nav.tabs{border-top:2px solid var(--line);gap:6px}
   <section class="panel" id="p-today">
     <div class="banner" id="lowbat" hidden>
       <h3>Low battery mode is on</h3>
-      <p class="note" style="margin:0">Today's plan is trimmed to your essentials and one small lift. Doing less on a hard day still counts.</p>
+      <p class="note" style="margin:0">Your plan now keeps only your essentials (up to three tasks marked ★) plus one small mood lift. Everything else can wait for a better day. Doing less on a hard day still counts.</p>
       <div id="lowbat-proof"></div>
+      <div class="eyebrow">Feel a little better</div>
+      <div class="kit" id="kit"></div>
+      <div class="eyebrow">Body basics · tap when done</div>
+      <div class="row chips" id="basics"></div>
     </div>
 
     <div class="card">
@@ -377,10 +397,10 @@ nav.tabs{border-top:2px solid var(--line);gap:6px}
     <div class="card">
       <div class="spread">
         <div><div class="eyebrow">Tasks</div><h2>What's on your plate</h2></div>
-        <span class="example" id="example-tag">Example tasks: replace with yours</span>
+        <span class="pill" id="task-count"></span>
       </div>
       <form class="addform" id="addform">
-        <input type="text" id="t-name" placeholder="Add a task, e.g. Write intro paragraph" aria-label="Task name" required>
+        <input type="text" id="t-name" placeholder="Add your own task, e.g. Finish Q3 budget" aria-label="Task name" required>
         <select id="t-tag" aria-label="Task type">
           <option value="deep">Deep work</option>
           <option value="creative">Creative</option>
@@ -393,9 +413,10 @@ nav.tabs{border-top:2px solid var(--line);gap:6px}
         </select>
         <button class="btn primary" type="submit">Add</button>
       </form>
-      <div class="row"><button class="btn" type="button" id="ideas-toggle">Need ideas? Browse 70+ tasks</button></div>
+      <div class="row"><button class="btn" type="button" id="ideas-toggle">Need ideas? Browse task ideas</button></div>
       <div class="stack ideas-panel" id="ideas" hidden>
-        <input type="text" id="ideas-q" placeholder="Search ideas, e.g. walk, email, read" aria-label="Search task ideas">
+        <p class="note" style="margin:0">Tap an idea to add it, then tap its name in your list to make it specific, for example "Write a report" becomes "Write the March sales report".</p>
+        <input type="text" id="ideas-q" placeholder="Search ideas, e.g. meeting, email, walk" aria-label="Search task ideas">
         <div class="row chips" id="ideas-cats"></div>
         <div class="ideas-list" id="ideas-list"></div>
         <div class="row"><button class="btn primary" type="button" id="ideas-done">Done</button><span class="note" id="ideas-msg" role="status"></span></div>
@@ -409,6 +430,7 @@ nav.tabs{border-top:2px solid var(--line);gap:6px}
         <div><div class="eyebrow">Your plan</div><h2>Matched to your energy</h2></div>
         <label class="toggle"><input type="checkbox" id="lowtoggle">Low battery mode</label>
       </div>
+      <p class="lowhelp">Feeling drained? Low battery mode trims today to your essentials and suggests ways to feel better. It turns on by itself when a check-in shows very low energy or mood.</p>
       <div class="plan" id="plan"></div>
     </div>
   </section>
@@ -601,19 +623,13 @@ const $=id=>document.getElementById(id);
 function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const DEF={
-  examples:true,
-  tasks:[
-    {id:1,name:"Draft methods section",tag:"deep",dur:90,ess:true,done:false},
-    {id:2,name:"Review two papers",tag:"deep",dur:60,ess:false,done:false},
-    {id:3,name:"Sketch figure ideas",tag:"creative",dur:45,ess:false,done:false},
-    {id:4,name:"Lab meeting",tag:"social",dur:60,ess:true,done:false},
-    {id:5,name:"Reply to emails",tag:"shallow",dur:30,ess:true,done:false},
-    {id:6,name:"Walk outside in daylight",tag:"lift",dur:20,ess:false,done:false}
-  ],
+  examples:false,
+  tasks:[],
   wake:"07:00",sleep:7,checkins:[],proofs:[],weeks:{},low:null,promptOffset:0,tfIndex:0,
   habits:[],cases:[],ladder:{},ladderArea:"general",releases:0,flips:[],dives:[],creatures:[],dive:null,diveResult:null,spiral:{}
 };
 let S=Object.assign({},DEF,load()||{});
+if(S.examples){S.tasks=[];S.examples=false}
 const TAGS={deep:"Deep",creative:"Creative",social:"Social",shallow:"Shallow",lift:"Lift"};
 
 // ---------- energy model ----------
@@ -664,16 +680,20 @@ function drawCurve(){
 
 // ---------- tasks ----------
 function renderTasks(){
-  const ul=document.getElementById("tasklist");ul.innerHTML="";
-  document.getElementById("example-tag").hidden=!S.examples;
-  if(!S.tasks.length){ul.innerHTML='<li class="note">No tasks yet. Add one above.</li>'}
+  const ul=$("tasklist");ul.innerHTML="";
+  const open=S.tasks.filter(t=>!t.done).length;
+  $("task-count").textContent=S.tasks.length?`${open} to do`:"";$("task-count").hidden=!S.tasks.length;
+  if(!S.tasks.length){ul.innerHTML='<li class="note">No tasks yet. Type your own above, or pick from the ideas and make them specific.</li>'}
   S.tasks.forEach(t=>{
     const li=document.createElement("li");li.className="task"+(t.done?" done":"");
-    li.innerHTML=`<input type="checkbox" ${t.done?"checked":""} aria-label="Done" id="d${t.id}"><span class="name">${esc(t.name)} <span class="fit">· ${t.dur} min</span></span><span class="chip t-${t.tag}">${TAGS[t.tag]}</span><span class="row" style="gap:0"><button class="icon-btn ${t.ess?"star":""}" title="Mark essential" aria-label="Toggle essential">${t.ess?"★":"☆"}</button><button class="icon-btn" title="Remove" aria-label="Remove task">×</button></span>`;
-    const [cb]=li.querySelectorAll("input");const [st,rm]=li.querySelectorAll("button");
+    li.innerHTML=`<input type="checkbox" ${t.done?"checked":""} aria-label="Done" id="d${t.id}"><span class="name" title="Tap to edit"><span class="nm">${esc(t.name)}</span> <span class="fit">· ${t.dur} min</span></span><span class="chip t-${t.tag}">${TAGS[t.tag]}</span><span class="row" style="gap:0"><button class="icon-btn ${t.ess?"star":""}" title="Mark essential" aria-label="Toggle essential">${t.ess?"★":"☆"}</button><button class="icon-btn" title="Remove" aria-label="Remove task">×</button></span>`;
+    const [cb]=li.querySelectorAll("input");const [st,rm]=li.querySelectorAll("button");const nm=li.querySelector(".name");
     cb.onchange=()=>{t.done=cb.checked;commit()};
     st.onclick=()=>{t.ess=!t.ess;commit()};
     rm.onclick=()=>{S.tasks=S.tasks.filter(x=>x!==t);commit()};
+    nm.onclick=()=>{if(nm.querySelector("input"))return;nm.innerHTML=`<input type="text" aria-label="Edit task name" value="${esc(t.name)}">`;const inp=nm.querySelector("input");inp.focus();inp.select();
+      const fin=ok=>{if(ok&&inp.value.trim())t.name=inp.value.trim();commit()};
+      inp.onkeydown=e=>{if(e.key==="Enter")fin(true);if(e.key==="Escape")fin(false)};inp.onblur=()=>fin(true)};
     ul.appendChild(li);
   });
 }
@@ -719,6 +739,7 @@ function renderPlan(){
   document.getElementById("lowtoggle").checked=low;
   const lb=document.getElementById("lowbat");lb.hidden=!low;
   if(low&&S.proofs.length){const p=S.proofs[Math.floor(Math.random()*S.proofs.length)];document.getElementById("lowbat-proof").innerHTML=`<div class="proof"><time>${p.date} · a reminder from you</time>${esc(p.text)}</div>`}else document.getElementById("lowbat-proof").innerHTML="";
+  if(low)renderKit();
   if(!out.length){el.innerHTML=`<p class="note">${S.tasks.filter(t=>!t.done).length?"No time left today for these. Tomorrow is fine.":"All done or nothing planned. Enjoy the rest of your day."}</p>`;return}
   el.innerHTML=out.map(o=>`<div class="slot"><time>${fmt(o.c)}</time><div><div class="what"><strong>${esc(o.t.name)}</strong><span class="chip t-${o.t.tag}">${TAGS[o.t.tag]}</span></div><div class="fit">${o.t.dur} min · ${fitText(o.t,o.e)}</div></div></div>`).join("")+(left.length?`<p class="note">Didn't fit today: ${left.map(t=>esc(t.name)).join(", ")}. Moving them to tomorrow is a plan, not a failure.</p>`:"");
 }
@@ -1144,14 +1165,17 @@ $("tf-mode").onclick=()=>{const own=!$("tf-own").hidden;$("tf-own").hidden=own;$
 
 // ---------- task ideas ----------
 const IDEAS={
- "Work & study":[["Write 300 words of a draft","deep",60],["Read one research paper","deep",60],["Analyze data or results","deep",90],["Code a feature or fix a bug","deep",90],["Study for an exam or test","deep",60],["Review someone's work","deep",45],["Plan this week's priorities","deep",30],["Outline a report or chapter","creative",45],["Prepare slides for a talk","creative",60],["Brainstorm ideas for a project","creative",30],["Team meeting","social",60],["One-on-one with my manager or supervisor","social",30],["Reply to work messages","shallow",30],["Update project notes","shallow",15],["Organize files and folders","shallow",30],["Submit a form or report","shallow",15]],
+ "Focus work":[["Work on my most important task","deep",90],["Write a report or document","deep",60],["Prepare a presentation","creative",60],["Analyze data or numbers","deep",60],["Solve a tricky problem","deep",60],["Review and edit a draft","deep",45],["Plan a project or next steps","deep",45],["Research a topic for work","deep",45],["Learn a skill for my job","deep",45],["Study for an exam or course","deep",60]],
+ "Meetings & people at work":[["Team meeting","social",60],["One-on-one with my manager","social",30],["Client or customer call","social",30],["Prepare for a meeting","shallow",15],["Follow up with a colleague","social",15],["Give feedback to someone","social",30],["Ask for help or a second opinion","social",15],["Reach out to a new contact","social",15],["Interview or hiring task","social",60],["Mentor or train someone","social",45]],
+ "Work admin & planning":[["Reply to emails","shallow",30],["Clear my inbox","shallow",30],["Plan tomorrow","shallow",15],["Do a weekly review","shallow",30],["Update my to-do list","shallow",15],["Update a tracker or timesheet","shallow",15],["Schedule meetings","shallow",15],["Submit expenses or a report","shallow",15],["Organize files and folders","shallow",30],["Tidy my desk","shallow",15]],
+ "Creative work":[["Brainstorm ideas","creative",30],["Design or sketch something","creative",45],["Write content or a post","creative",45],["Improve a process","creative",45],["Make a mind map or plan","creative",30]],
  "Home & chores":[["Do the laundry","shallow",30],["Wash the dishes","shallow",15],["Tidy one room","shallow",30],["Clean the bathroom","shallow",30],["Change the bedsheets","shallow",15],["Take out the trash","shallow",15],["Grocery shopping","shallow",45],["Plan meals for the week","shallow",15],["Cook a proper meal","creative",45],["Water the plants","lift",15],["Fix something that's broken","shallow",30]],
  "Health & body":[["Go for a walk","lift",30],["Work out or play a sport","lift",45],["Stretch or do yoga","lift",15],["Get some sunlight outside","lift",15],["Drink a full bottle of water","lift",15],["Prepare a healthy snack","shallow",15],["Take my medicine or vitamins","shallow",15],["Book a doctor or dentist appointment","shallow",15],["Wind down early for bed","lift",30]],
  "Mind & mood":[["Journal for 10 minutes","lift",15],["Meditate","lift",15],["Do a breathing exercise","lift",15],["Read for pleasure","lift",30],["Listen to music I love","lift",15],["Write down three good things","lift",15],["Take a real break with no screens","lift",15],["Do a Bloomday check-in","lift",15]],
  "People":[["Call a family member","social",30],["Message a friend","social",15],["Meet a friend","social",60],["Thank someone","social",15],["Help someone with something","social",30],["Plan something fun with someone","social",15],["Reply to personal messages","shallow",15],["Spend time with my partner or family","social",60]],
  "Admin & money":[["Pay bills","shallow",15],["Check my budget or bank account","shallow",15],["Reply to important emails","shallow",30],["Clear my inbox","shallow",30],["Do paperwork or fill a form","shallow",30],["Schedule appointments","shallow",15],["Renew a document or subscription","shallow",15],["Back up my phone or laptop","shallow",15]],
  "Creative & hobbies":[["Draw or paint","creative",45],["Play an instrument","creative",30],["Write something just for fun","creative",30],["Take photos on a walk","creative",45],["Work on a side project","creative",60],["Try a new recipe","creative",45],["Do a craft or DIY project","creative",60]],
- "Learning & growth":[["Practice a language","deep",30],["Read a chapter of a non-fiction book","deep",30],["Watch a lecture or talk","deep",45],["Do one lesson of an online course","deep",45],["Follow a tutorial to learn a skill","deep",30]]
+ "Learning & growth":[["Practice a language","deep",30],["Read a chapter of a non-fiction book","deep",30],["Read an article in my field","deep",30],["Watch a lecture or talk","deep",45],["Do one lesson of an online course","deep",45],["Follow a tutorial to learn a skill","deep",30]]
 };
 let ideaCat="All";
 function renderIdeas(){
@@ -1173,9 +1197,9 @@ function renderIdeas(){
     $("ideas-msg").textContent=`Added "${b.dataset.n}".`;commit();
   });
 }
-$("ideas-toggle").onclick=()=>{const p=$("ideas");p.hidden=!p.hidden;$("ideas-toggle").textContent=p.hidden?"Need ideas? Browse 70+ tasks":"Hide task ideas";if(!p.hidden)renderIdeas()};
+$("ideas-toggle").onclick=()=>{const p=$("ideas");p.hidden=!p.hidden;$("ideas-toggle").textContent=p.hidden?"Need ideas? Browse task ideas":"Hide task ideas";if(!p.hidden)renderIdeas()};
 $("ideas-q").oninput=renderIdeas;
-$("ideas-done").onclick=()=>{$("ideas").hidden=true;$("ideas-toggle").textContent="Need ideas? Browse 70+ tasks"};
+$("ideas-done").onclick=()=>{$("ideas").hidden=true;$("ideas-toggle").textContent="Need ideas? Browse task ideas"};
 
 // ---------- Focus Dive (Deep Work) ----------
 const CREATURES=[{d:5,id:"fish",name:"Clownfish"},{d:15,id:"turtle",name:"Sea turtle"},{d:25,id:"jelly",name:"Jellyfish"},{d:40,id:"ray",name:"Manta ray"},{d:60,id:"whale",name:"Blue whale"},{d:85,id:"angler",name:"Anglerfish"}];
@@ -1330,6 +1354,7 @@ const EXTRA_GLYPH={
  star:'<path d="M22 6l4.6 10 10.9 1.2-8.1 7.4 2.3 10.8L22 30l-9.7 5.4 2.3-10.8-8.1-7.4L17.4 16z" fill="var(--social)"/>',
  flower:FLOWER(22,22,1)
 };
+function MARK(){let g="";for(let i=0;i<5;i++)g+=`<ellipse cx="22" cy="12.5" rx="6.5" ry="10" fill="var(--tide)" opacity="${i%2?.5:.9}" transform="rotate(${i*72} 22 22)"/>`;return g+`<circle cx="22" cy="22" r="4.5" fill="var(--sun)"/>`}
 function FLOWER(cx,cy,s){let g="";for(let i=0;i<6;i++){g+=`<ellipse cx="${cx}" cy="${cy-9*s}" rx="${5.5*s}" ry="${9*s}" fill="${["#FF4F9A","#FF7A2F","#FFB020","#2DBE6C","#3BA6E8","#8B5CF6"][i]}" transform="rotate(${i*60} ${cx} ${cy})"/>`}return g+`<circle cx="${cx}" cy="${cy}" r="${6*s}" fill="#FFF3B0" stroke="#241A45" stroke-width="${1.5*s}"/>`}
 function badgeSVG(b,on){const glyph=GLYPH[b.g]||EXTRA_GLYPH[b.g]||"";
   return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="${on?b.c:"var(--line)"}"/><circle cx="32" cy="32" r="24" fill="var(--surface)"/><circle cx="32" cy="32" r="27" fill="none" stroke="var(--surface)" stroke-width="1.5" stroke-dasharray="3 3" opacity=".7"/><g transform="translate(14,14) scale(.82)">${glyph}</g></svg>`}
@@ -1346,12 +1371,12 @@ function renderBadges(){
 }
 let toastQ=[],toastBusy=false;
 function toast(msg){toastQ.push(msg);if(!toastBusy)nextToast()}
-function nextToast(){const m=toastQ.shift(),el=$("toast");if(!m){toastBusy=false;return}toastBusy=true;el.innerHTML=`<svg viewBox="0 0 44 44" width="20" height="20" aria-hidden="true">${FLOWER(22,22,1)}</svg><span>${m}</span>`;el.classList.add("show");setTimeout(()=>{el.classList.remove("show");setTimeout(nextToast,260)},1900)}
+function nextToast(){const m=toastQ.shift(),el=$("toast");if(!m){toastBusy=false;return}toastBusy=true;el.innerHTML=`<span class="tdot"></span><span>${m}</span>`;el.classList.add("show");setTimeout(()=>{el.classList.remove("show");setTimeout(nextToast,260)},1900)}
 const reduceMotion=()=>{try{return matchMedia("(prefers-reduced-motion: reduce)").matches}catch(e){return false}};
 function confetti(n){
   if(reduceMotion())return;
   const cv=$("confetti"),ctx=cv.getContext("2d"),W=cv.width=innerWidth,H=cv.height=innerHeight;
-  const cols=["#FF4F9A","#FF7A2F","#FFB020","#2DBE6C","#3BA6E8","#8B5CF6"];
+  const cols=["#6C3CE0","#A98BFF","#F29A00","#F23D8E","#16B89A"];
   const ps=Array.from({length:n},()=>({x:W/2+(Math.random()-.5)*W*.3,y:H*.35,vx:(Math.random()-.5)*12,vy:-Math.random()*12-4,s:5+Math.random()*7,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[Math.floor(Math.random()*cols.length)],round:Math.random()<.35}));
   let t=0;cv.hidden=false;
   (function frame(){t++;ctx.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;if(p.round){ctx.beginPath();ctx.arc(0,0,p.s/2,0,7);ctx.fill()}else ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);ctx.restore()});
@@ -1363,15 +1388,27 @@ function celebrate(){
   if(lastPetals!==null&&p>lastPetals){
     const d=p-lastPetals,a=levelOf(lastPetals),b=levelOf(p);
     toast(`+${d} petals`);
-    if(b.i>a.i){confetti(180);toast(`Level up! You're a ${b.name} now`)}else if(d>=10)confetti(70);
+    if(b.i>a.i){confetti(90);toast(`Level up! You're a ${b.name} now`)}
   }
   lastPetals=p;
   const earned=BADGES.filter(b=>b.t()).map(b=>b.id);
   if(S.badgesSeen===null){S.badgesSeen=earned;save();return}
   const fresh=earned.filter(id=>!S.badgesSeen.includes(id));
-  if(fresh.length){S.badgesSeen.push(...fresh);save();confetti(140);fresh.forEach(id=>toast(`New badge: ${BADGES.find(b=>b.id===id).name}`))}
+  if(fresh.length){S.badgesSeen.push(...fresh);save();confetti(70);fresh.forEach(id=>toast(`New badge: ${BADGES.find(b=>b.id===id).name}`))}
 }
 $("levelcard").onclick=()=>{document.querySelector('.tab[data-p="reflect"]').click();setTimeout(()=>$("badges-card").scrollIntoView({behavior:reduceMotion()?"auto":"smooth"}),50)};
+
+
+// ---------- low battery kit ----------
+const KIT=[["breath","Calm down in a minute","Breathing Balloon"],["spiral","Take one tiny step","Upward Spiral"],["flip","Lift a heavy thought","Thought Flip"],["let","Put a worry down","Letting Go"]];
+const BASICS=[["calm","Drink a glass of water"],["light","Step into daylight for 5 minutes"],["connect","Message someone I trust"],["goal","Eat something simple"],["calm","Rest 20 minutes, guilt-free"],["move","Stretch for 2 minutes"]];
+function goGame(id){document.querySelector('.tab[data-p="games"]').click();openGame(id)}
+function renderKit(){
+  const k=$("kit");k.innerHTML="";
+  KIT.forEach(([id,label,name])=>{const b=document.createElement("button");b.type="button";b.className="kitbtn";b.style.setProperty("--tc",TILEC[id]);b.innerHTML=`<span class="tglyph"><svg viewBox="0 0 44 44" aria-hidden="true">${GLYPH[id]}</svg></span><span><b>${label}</b><small>${name}</small></span>`;b.onclick=()=>goGame(id);k.appendChild(b)});
+  const today=(S.spiral[todayStr()]||[]).map(x=>x.label);const r=$("basics");r.innerHTML="";
+  BASICS.forEach(([cat,label])=>{const b=document.createElement("button");b.type="button";b.className="chip-btn";const done=today.includes(label);b.textContent=(done?"✓ ":"")+label;if(done)b.classList.add("on");b.onclick=()=>{if(!done)logSpiral(cat,label)};r.appendChild(b)});
+}
 
 // ---------- wiring ----------
 document.getElementById("addform").onsubmit=e=>{
@@ -1393,8 +1430,8 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
 document.getElementById("today-label").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});
 function commit(){save();render();celebrate()}
 function render(){renderLevel();renderBadges();if(!$("ideas").hidden)renderIdeas();drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF();renderGames()}
-if(S.examples){$("ideas").hidden=false;$("ideas-toggle").textContent="Hide task ideas"}
-$("logo").innerHTML=FLOWER(22,22,1);
+if(!S.tasks.length){$("ideas").hidden=false;$("ideas-toggle").textContent="Hide task ideas"}
+$("logo").innerHTML=MARK();
 render();celebrate();
 if(S.dive)ensureDiveTimer();
 })();
