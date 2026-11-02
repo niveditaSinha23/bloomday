@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Plan your day around your energy, check in on your mood, and build confidence.">
+<meta name="theme-color" content="#2C6F68">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ebb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>ebb</title>
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px;font-family:system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single centered column, app-style tab bar; tide-line energy chart as the signature element */
+:root{
+  --bg:#EDF1EF; --surface:#F8FAF9; --ink:#1C2A2B; --muted:#5E6E6C; --line:#D3DCD9;
+  --tide:#2C6F68; --tide-soft:#D6E8E4; --sun:#C98A1E; --sun-soft:#F5E6C8;
+  --deep:#2C6F68; --creative:#7A5AA6; --social:#B5603F; --shallow:#6B7C7A; --lift:#C98A1E;
+  --alert-bg:#FBEDE8; --alert-ink:#8A3A22;
+  --sea:#D7EBE8; --sea-deep:#A9CFCA; --sand:#E6D9BB; --paper:#F7F1E3;
+  --coral-a:#D9694E; --coral-b:#D79A2B; --coral-c:#8C6BB8; --coral-d:#3E8E83;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121A1B; --surface:#1A2425; --ink:#E4ECEA; --muted:#97A7A4; --line:#2C3A3B;
+  --tide:#6CC0B5; --tide-soft:#20393A; --sun:#E8B65A; --sun-soft:#3A3020;
+  --deep:#6CC0B5; --creative:#B79BE0; --social:#E79A7A; --shallow:#9AAAA8; --lift:#E8B65A;
+  --alert-bg:#3A221B; --alert-ink:#F2B8A3;
+  --sea:#1B3739; --sea-deep:#10272A; --sand:#3B3427; --paper:#2B2720;
+  --coral-a:#EE8B70; --coral-b:#EDBA5C; --coral-c:#B99BE6; --coral-d:#6CC0B5;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121A1B; --surface:#1A2425; --ink:#E4ECEA; --muted:#97A7A4; --line:#2C3A3B;
+  --tide:#6CC0B5; --tide-soft:#20393A; --sun:#E8B65A; --sun-soft:#3A3020;
+  --deep:#6CC0B5; --creative:#B79BE0; --social:#E79A7A; --shallow:#9AAAA8; --lift:#E8B65A;
+  --alert-bg:#3A221B; --alert-ink:#F2B8A3;
+  --sea:#1B3739; --sea-deep:#10272A; --sand:#3B3427; --paper:#2B2720;
+  --coral-a:#EE8B70; --coral-b:#EDBA5C; --coral-c:#B99BE6; --coral-d:#6CC0B5;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 96px}
+header.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:700 30px/1.1 var(--display);margin:0;letter-spacing:-.01em}
+h1 span{color:var(--tide)}
+h2{font:700 20px/1.2 var(--display);margin:0;text-wrap:balance}
+h3{font:600 15px/1.3 var(--body);margin:0}
+.date{font:500 13px var(--mono);color:var(--muted)}
+.lede{color:var(--muted);margin:4px 0 0;max-width:60ch}
+section.panel{display:grid;gap:18px;margin-top:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;min-width:0}
+.eyebrow{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--tide)}
+.btn.primary{background:var(--tide);border-color:var(--tide);color:var(--surface)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.tab:focus-visible,.scale button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+input[type=text],input[type=number],input[type=time],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+textarea{width:100%;resize:vertical;min-height:72px}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+/* tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:8px max(12px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-right,0px));z-index:5}
+.tab{border:0;background:none;padding:8px 14px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;display:grid;justify-items:center;gap:2px}
+.tab small{font:400 10px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.tab[aria-selected="true"]{color:var(--tide);background:var(--tide-soft)}
+/* chart */
+.chart-box{overflow-x:auto}
+svg.curve{width:100%;min-width:480px;height:auto;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* tasks */
+.chip{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.t-deep{color:var(--deep)} .t-creative{color:var(--creative)} .t-social{color:var(--social)} .t-shallow{color:var(--shallow)} .t-lift{color:var(--lift)}
+ul.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.task{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.task .name{min-width:0;overflow-wrap:anywhere}
+.task.done .name{text-decoration:line-through;color:var(--muted)}
+.icon-btn{border:0;background:none;cursor:pointer;color:var(--muted);padding:4px 6px;border-radius:6px;font-size:16px;line-height:1}
+.icon-btn:hover{color:var(--ink);background:var(--tide-soft)}
+.star{color:var(--sun)}
+.addform{display:grid;grid-template-columns:1fr 130px 90px auto;gap:8px}
+@media (max-width:560px){.addform{grid-template-columns:1fr 1fr}.addform input[type=text]{grid-column:1/-1}}
+.plan{display:grid;gap:6px}
+.slot{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;padding:8px 0;border-bottom:1px dashed var(--line)}
+.slot:last-child{border-bottom:0}
+.slot time{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.slot .what{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.fit{font-size:12px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+.example{font:500 11px var(--mono);background:var(--sun-soft);color:var(--ink);padding:2px 8px;border-radius:6px}
+.banner{background:var(--sun-soft);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.toggle input{width:18px;height:18px;accent-color:var(--tide)}
+/* check-in */
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 4px;cursor:pointer;display:grid;gap:2px;justify-items:center;font-size:12px;color:var(--muted)}
+.scale button b{font:700 18px var(--display);color:var(--ink)}
+.scale button[aria-pressed="true"]{border-color:var(--tide);background:var(--tide-soft);color:var(--ink)}
+.hist{display:grid;gap:6px}
+.hrow{display:grid;grid-template-columns:120px 1fr 1fr;gap:10px;align-items:center;font-size:13px}
+.hrow time{font:400 12px var(--mono);color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:4px}
+.support{background:var(--alert-bg);color:var(--alert-ink);border-radius:12px;padding:14px;display:grid;gap:6px}
+.support strong{font-size:16px}
+.num{font:600 15px var(--mono);user-select:all}
+/* reflect */
+.prompt{font:500 21px/1.35 var(--display);text-wrap:balance;margin:0}
+.proof{padding:10px 12px;border-left:3px solid var(--sun);background:var(--bg);border-radius:0 10px 10px 0}
+.proof time{font:400 11px var(--mono);color:var(--muted);display:block}
+.weekq{display:grid;gap:14px}
+.wk{display:flex;gap:6px;align-items:flex-end;height:70px}
+.wk div{flex:1;background:var(--tide);border-radius:4px 4px 0 0;min-height:4px;position:relative}
+.wk-labels{display:flex;gap:6px;font:400 10px var(--mono);color:var(--muted)}
+.wk-labels span{flex:1;text-align:center}
+/* thought flip */
+.flipwrap{perspective:1000px}
+.flipcard{position:relative;min-height:170px;transition:transform .6s;transform-style:preserve-3d}
+.flipcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:20px;display:grid;align-content:center;gap:8px}
+.face.front{background:var(--ink);color:var(--bg)}
+.face.back{background:var(--tide-soft);color:var(--ink);transform:rotateY(180deg)}
+.face .q{font:600 20px/1.35 var(--display)}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;cursor:pointer}
+.opt:hover{border-color:var(--tide)}
+.opt.nope{opacity:.5;text-decoration:line-through}
+.feedback{font-size:14px;min-height:1.4em;color:var(--muted)}
+/* balloon */
+.sky{position:relative;height:300px;border-radius:14px;background:linear-gradient(var(--tide-soft),var(--bg));overflow:hidden;display:grid;place-items:center}
+.balloon{width:120px;height:140px;border-radius:50% 50% 48% 48%;background:var(--sun);transform:scale(.55);transition:transform 4s ease-in-out;position:relative;box-shadow:inset -14px -12px 0 rgba(0,0,0,.08)}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:80px;background:var(--muted)}
+.balloon.float{transition:transform 3s ease-in;transform:translateY(-420px) scale(.8)}
+.phase{position:absolute;bottom:14px;left:0;right:0;text-align:center;font:600 18px var(--display)}
+.count{position:absolute;top:12px;right:14px;font:500 13px var(--mono);color:var(--muted)}
+/* games hub + new games */
+.stack{display:grid;gap:14px}
+.hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:360px){.hub{grid-template-columns:1fr}}
+.tile{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;cursor:pointer;display:grid;gap:6px;align-content:start;min-width:0}
+.tile:hover{border-color:var(--tide)}
+.tile:focus-visible,.zone:focus-visible,.item:focus-visible,.chip-btn:focus-visible,.opt:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+.tile svg{width:40px;height:40px}
+.tile h3{font:700 16px/1.2 var(--display)}
+.tile p{margin:0;font-size:13px;color:var(--muted)}
+.tile .meta{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font:500 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tile .meta b{color:var(--tide);font-weight:500}
+.back{justify-self:start}
+.game{display:grid;gap:18px}
+.chips{gap:6px}
+.chip-btn{border:1px dashed var(--muted);background:none;border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;color:var(--muted)}
+.chip-btn:hover{color:var(--ink);border-style:solid}
+svg.reef{width:100%;height:auto;display:block;border-radius:12px}
+.habit{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.habit .hbody{min-width:0;overflow-wrap:anywhere}
+.dots{display:flex;gap:3px;margin-top:6px}
+.dots i{width:9px;height:9px;border-radius:3px;background:var(--line)}
+.dots i.on{background:var(--coral-d)}
+.stackform{display:grid;gap:10px}
+.jars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.jar{display:grid;justify-items:center;gap:4px;text-align:center;padding:12px;border-radius:12px;background:var(--bg);position:relative}
+.jar svg{width:110px;height:auto}
+.jar .lvl{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--tide)}
+.jar .icon-btn{position:absolute;top:4px;right:4px}
+@keyframes drop{from{transform:translateY(-90px);opacity:0}to{transform:none;opacity:1}}
+.tok-new{animation:drop .7s cubic-bezier(.3,1.4,.6,1)}
+.room{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px;border:3px solid var(--ink);border-radius:4px;background:var(--bg)}
+.zone{min-height:118px;border:1px dashed var(--muted);border-radius:3px;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;align-items:flex-start;background:var(--surface);min-width:0}
+.zone.target{border:1px solid var(--sun);background:var(--sun-soft)}
+.zone .zl{font:500 10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.item{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 9px;font-size:13px;cursor:pointer;text-align:left;max-width:100%}
+.item[aria-pressed="true"]{border-color:var(--sun);box-shadow:0 0 0 2px var(--sun)}
+.meters{display:grid;gap:10px}
+.meter{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px}
+.meter .bar{grid-column:1/-1;height:10px}
+.meter .bar span{transition:width .4s}
+.meter b{font:500 13px var(--mono);font-variant-numeric:tabular-nums}
+.checklist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.checklist label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.checklist input{margin-top:4px;accent-color:var(--tide)}
+.casefile{background:var(--paper);border-radius:4px 14px 14px 14px;padding:18px;display:grid;gap:12px;position:relative;border:1px solid var(--line);min-width:0}
+.case-title{font:700 19px/1.25 var(--display);margin:0;padding-right:90px}
+.casegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:420px){.casegrid{grid-template-columns:1fr}}
+.casebtn{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:4px 12px 12px 12px;padding:14px;cursor:pointer;display:grid;gap:4px}
+.casebtn:hover{border-color:var(--social)}
+.casebtn b{font:700 15px var(--display)}
+.casebtn span{font-size:13px;color:var(--muted)}
+.loop{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+@media (max-width:520px){.loop{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.lb{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 9px;font-size:12px;min-width:0;overflow-wrap:anywhere}
+.lb b{display:block;font:500 10px var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--social)}
+.lb.empty{color:var(--muted);border-style:dashed}
+.stamp{position:absolute;top:16px;right:14px;transform:rotate(-8deg);border:3px solid var(--social);color:var(--social);font:700 13px var(--mono);padding:4px 8px;border-radius:4px;letter-spacing:.1em}
+.progress{display:flex;gap:4px}
+.progress i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.progress i.on{background:var(--social)}
+.ownrow{display:flex;gap:8px;flex-wrap:wrap}
+.ownrow input{flex:1 1 200px}
+.ladderwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:center}
+@media (max-width:560px){.ladderwrap{grid-template-columns:1fr}}
+.ladder{list-style:none;margin:0;padding:6px 12px;display:flex;flex-direction:column-reverse;gap:8px;border-left:5px solid var(--creative);border-right:5px solid var(--creative);border-radius:3px}
+.rung{padding:8px 10px;border-radius:6px;font-size:13px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.rung.done{color:var(--ink)}
+.rung.done::before{content:"✓ ";color:var(--creative);font-weight:700}
+.rung.cur{border:2px solid var(--creative);color:var(--ink);font-weight:600}
+.rung.locked{opacity:.5;filter:blur(2px);user-select:none}
+@keyframes climb{from{transform:translateY(12px);opacity:.3}to{transform:none;opacity:1}}
+.rung.cur.just{animation:climb .5s ease-out}
+.say{font:600 22px/1.35 var(--display);margin:0;text-wrap:balance}
+.lg-sky{align-content:start;padding-top:26px;height:340px}
+.lg-note{position:absolute;top:calc(100% + 74px);left:50%;transform:translateX(-50%) rotate(-4deg);background:var(--paper);color:var(--ink);font-size:11px;line-height:1.3;padding:5px 7px;width:130px;border:1px solid var(--line);border-radius:3px;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){.tok-new,.rung.cur.just{animation:none}}
+footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.flipcard,.balloon,.balloon.float{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>ebb<span>.</span></h1>
+      <p class="lede">Plan your day around your energy. Be kind to yourself on the low ones.</p>
+    </div>
+    <div class="date" id="today-label"></div>
+  </header>
+
+  <!-- TODAY -->
+  <section class="panel" id="p-today">
+    <div class="banner" id="lowbat" hidden>
+      <h3>Low battery mode is on</h3>
+      <p class="note" style="margin:0">Today's plan is trimmed to your essentials and one small lift. Doing less on a hard day still counts.</p>
+      <div id="lowbat-proof"></div>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div>
+          <div class="eyebrow">Today's energy forecast</div>
+          <h2 id="forecast-head">Your peaks and dips</h2>
+        </div>
+        <div class="row">
+          <label class="f">Woke at<input type="time" id="wake" value="07:00"></label>
+          <label class="f">Slept (hrs)<input type="number" id="sleep" min="3" max="12" step="0.5" value="7" style="width:80px"></label>
+        </div>
+      </div>
+      <div class="chart-box"><svg class="curve" id="curve" viewBox="0 0 640 200" role="img" aria-label="Predicted energy across the day"></svg></div>
+      <div class="legend"><span><i style="background:var(--tide)"></i>Predicted energy</span><span><i style="background:var(--sun)"></i>Your check-ins</span><span><i style="background:var(--tide-soft)"></i>Peak windows</span></div>
+      <p class="note" style="margin:0" id="forecast-note"></p>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div><div class="eyebrow">Tasks</div><h2>What's on your plate</h2></div>
+        <span class="example" id="example-tag">Example tasks: replace with yours</span>
+      </div>
+      <form class="addform" id="addform">
+        <input type="text" id="t-name" placeholder="Add a task, e.g. Write intro paragraph" aria-label="Task name" required>
+        <select id="t-tag" aria-label="Task type">
+          <option value="deep">Deep work</option>
+          <option value="creative">Creative</option>
+          <option value="social">Social / meeting</option>
+          <option value="shallow">Shallow / admin</option>
+          <option value="lift">Lift (mood boost)</option>
+        </select>
+        <select id="t-dur" aria-label="Duration">
+          <option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option><option value="60">1 hr</option><option value="90">1.5 hr</option><option value="120">2 hr</option>
+        </select>
+        <button class="btn primary" type="submit">Add</button>
+      </form>
+      <ul class="list" id="tasklist"></ul>
+      <p class="note" style="margin:0">★ marks an essential. On low-energy days, only essentials stay on the plan.</p>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div><div class="eyebrow">Your plan</div><h2>Matched to your energy</h2></div>
+        <label class="toggle"><input type="checkbox" id="lowtoggle">Low battery mode</label>
+      </div>
+      <div class="plan" id="plan"></div>
+    </div>
+  </section>
+
+  <!-- CHECK-IN -->
+  <section class="panel" id="p-check" hidden>
+    <div class="card">
+      <div class="eyebrow">Check-in · takes 10 seconds</div>
+      <h2>How are you right now?</h2>
+      <div>
+        <h3 style="margin-bottom:6px">Energy</h3>
+        <div class="scale" id="sc-energy" role="group" aria-label="Energy level"></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:6px">Mood</h3>
+        <div class="scale" id="sc-mood" role="group" aria-label="Mood"></div>
+      </div>
+      <label class="f">Anything on your mind? (optional, stays on this device)
+        <textarea id="ci-note" placeholder="e.g. Slept badly, meeting went well..."></textarea>
+      </label>
+      <div class="row"><button class="btn primary" id="ci-save">Save check-in</button><span class="note" id="ci-msg" role="status"></span></div>
+    </div>
+    <div class="support" id="support" hidden>
+      <strong>You don't have to carry this alone.</strong>
+      <span>If things feel very heavy, please talk to someone now. In India, Tele-MANAS is free and open 24/7: <span class="num">14416</span> or <span class="num">1-800-891-4416</span>. If you are in danger, call <span class="num">112</span>.</span>
+      <span>Outside India, your local emergency number or a nearby crisis line can help.</span>
+    </div>
+    <div class="card">
+      <div class="spread"><div><div class="eyebrow">Recent check-ins</div><h2>Your pattern</h2></div></div>
+      <div class="hist" id="hist"></div>
+      <p class="note" id="pattern" style="margin:0"></p>
+    </div>
+  </section>
+
+  <!-- REFLECT -->
+  <section class="panel" id="p-reflect" hidden>
+    <div class="card">
+      <div class="eyebrow">Today's confidence prompt</div>
+      <p class="prompt" id="prompt"></p>
+      <textarea id="pr-answer" placeholder="Something small counts. A real example beats a big claim."></textarea>
+      <div class="row"><button class="btn primary" id="pr-save">Add to proof of me</button><button class="btn" id="pr-skip">Different prompt</button><span class="note" id="pr-msg" role="status"></span></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Weekly · 1 = not really, 5 = very true</div>
+      <h2>This week</h2>
+      <div class="weekq" id="weekq"></div>
+      <div class="row"><button class="btn primary" id="wk-save">Save this week</button><span class="note" id="wk-msg" role="status"></span></div>
+      <div id="wk-chart-wrap" hidden>
+        <div class="eyebrow" style="margin-bottom:6px">Your weekly average</div>
+        <div class="wk" id="wk-chart"></div>
+        <div class="wk-labels" id="wk-labels"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Proof of me</div>
+      <h2>Things you did</h2>
+      <ul class="list" id="proofs"></ul>
+    </div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="panel" id="p-games" hidden>
+    <div class="stack" id="hubwrap">
+      <div><div class="eyebrow">Games</div><h2>Small games, real habits</h2><p class="lede">Each takes a few minutes. None of them can be lost.</p></div>
+      <div class="hub" id="hub"></div>
+    </div>
+    <button class="btn back" id="g-back" hidden>&larr; All games</button>
+
+    <div class="game" id="g-reef" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Reef Builder &middot; inspired by Atomic Habits</div><h2>Grow a reef, one tiny habit at a time</h2></div>
+        <svg class="reef" id="reef-svg" viewBox="0 0 600 260" role="img" aria-label="Your habit reef"></svg>
+        <p class="note" style="margin:0">Every day you do a habit, a piece of coral grows. Miss one day and nothing changes. Miss two in a row and one piece fades until you come back.</p>
+      </div>
+      <div class="card"><h3>Your habits</h3><ul class="list" id="reef-list"></ul></div>
+      <div class="card">
+        <h3>Stack a new habit</h3>
+        <form id="reef-form" class="stackform">
+          <label class="f">After I&hellip;<input type="text" id="rf-cue" placeholder="make my morning tea" required></label>
+          <div class="row chips" id="rf-cues"></div>
+          <label class="f">I will&hellip;<input type="text" id="rf-habit" placeholder="write one sentence of my paper" required></label>
+          <label class="toggle"><input type="checkbox" id="rf-two">This takes two minutes or less</label>
+          <p class="note" id="rf-msg" role="status" style="margin:0">Shrink it until it's easy. "Read a paper" becomes "read one abstract".</p>
+          <div><button class="btn primary" type="submit">Plant this habit</button></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="game" id="g-id" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Identity Votes &middot; inspired by Atomic Habits</div><h2>Every small action is a vote</h2></div>
+        <p class="note" style="margin:0">Pick who you're becoming. Each time you act like that person, drop a vote in the jar.</p>
+        <div class="jars" id="jars"></div>
+      </div>
+      <div class="card" id="iv-card">
+        <h3>Cast a vote</h3>
+        <div class="row"><select id="iv-who" aria-label="Who is this vote for"></select><input type="text" id="iv-what" placeholder="What did you do? e.g. walked for 10 minutes" style="flex:1 1 200px"><button class="btn primary" id="iv-cast">Vote</button></div>
+        <div id="iv-quick"></div>
+        <span class="note" id="iv-msg" role="status"></span>
+        <ul class="list" id="iv-log"></ul>
+      </div>
+      <div class="card">
+        <h3>Add an identity</h3>
+        <p class="note" style="margin:0">Up to three. Small and specific works best.</p>
+        <form class="row" id="id-form"><input type="text" id="id-name" placeholder="someone who moves every day" style="flex:1 1 200px" required><button class="btn" type="submit">Add</button></form>
+        <div class="row chips" id="id-sugg"></div>
+      </div>
+    </div>
+
+    <div class="game" id="g-room" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Room Rearrange &middot; inspired by Atomic Habits</div><h2>Make good habits easy and bad ones awkward</h2></div>
+        <div class="row" id="rm-tabs"></div>
+        <p class="note" id="rm-hint" style="margin:0">Tap an item, then tap where it should go.</p>
+        <div class="room" id="room"></div>
+        <div class="meters" id="rm-meters"></div>
+        <div class="row"><button class="btn primary" id="rm-real">Make it real</button><button class="btn" id="rm-reset">Reset room</button></div>
+        <div id="rm-check" hidden></div>
+      </div>
+    </div>
+
+    <div class="game" id="g-det" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Habit Loop Detective &middot; inspired by Atomic Habits</div><h2>Crack the case of a habit you want to change</h2></div>
+        <div id="det"></div>
+      </div>
+      <div class="card"><h3>Solved cases</h3><ul class="list" id="det-solved"></ul></div>
+    </div>
+
+    <div class="game" id="g-ladder" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Believability Ladder &middot; inspired by You Can Heal Your Life</div><h2>Climb toward kinder self-talk</h2></div>
+        <p class="note" style="margin:0">You only climb when a statement feels at least somewhat true. No forcing it.</p>
+        <div class="row" id="ld-areas"></div>
+        <div class="ladderwrap"><ol class="ladder" id="ladder"></ol><div class="stack" id="ld-side"></div></div>
+      </div>
+    </div>
+
+    <div class="game" id="g-let" hidden>
+      <div class="card">
+        <div><div class="eyebrow">Letting Go &middot; inspired by You Can Heal Your Life</div><h2>Put something down for today</h2></div>
+        <p class="note" style="margin:0">What you write here is never saved. It's gone once the balloon leaves.</p>
+        <div class="sky lg-sky"><div class="count" id="lg-count"></div><div class="balloon" id="lg-balloon"><div class="lg-note" id="lg-note" hidden></div></div><div class="phase" id="lg-phase"></div></div>
+        <div class="stack" id="lg-step"></div>
+      </div>
+    </div>
+
+    <div class="game" id="g-flip" hidden>
+    <div class="card">
+      <div class="spread"><div><div class="eyebrow">Game · Thought Flip</div><h2>Find the balanced thought</h2></div><span class="note" id="tf-count"></span></div>
+      <div class="flipwrap"><div class="flipcard" id="tf-card">
+        <div class="face front"><span class="eyebrow" style="color:inherit;opacity:.7" id="tf-trap"></span><div class="q" id="tf-thought"></div></div>
+        <div class="face back"><span class="eyebrow" id="tf-backtrap"></span><div class="q" style="font-size:16px" id="tf-why"></div><div class="note" style="color:inherit">Next time: what would you say to a friend who thought this?</div></div>
+      </div></div>
+      <div class="opts" id="tf-opts"></div>
+      <div class="feedback" id="tf-feedback" role="status"></div>
+      <div><button class="btn" id="tf-next" hidden>Next card</button></div>
+    </div>
+    </div>
+    <div class="game" id="g-breath" hidden>
+    <div class="card">
+      <div class="spread"><div><div class="eyebrow">Game · Breathing Balloon</div><h2>Box breathing, 4 seconds a side</h2></div>
+        <div class="row"><select id="br-rounds" aria-label="Rounds"><option value="3">3 rounds</option><option value="5" selected>5 rounds</option><option value="8">8 rounds</option></select><button class="btn primary" id="br-start">Start</button></div></div>
+      <div class="sky"><div class="count" id="br-count"></div><div class="balloon" id="balloon"></div><div class="phase" id="br-phase">Press start when ready</div></div>
+    </div>
+    </div>
+  </section>
+
+  <footer class="help">Your data stays in this browser only. ebb is a self-help tool, not a treatment. If you feel low for more than two weeks, a doctor or counsellor can help. Tele-MANAS (India, 24/7): <span class="num">14416</span></footer>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="today">Today<small>plan</small></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="check">Check-in<small>how now</small></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="reflect">Reflect<small>proof</small></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="games">Games<small>reset</small></button>
+</nav>
+
+<script>
+(function(){
+const KEY="ebb-v1";
+const localDate=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const todayStr=()=>localDate();
+const addDays=(str,n)=>{const[y,m,d]=str.split("-").map(Number);return localDate(new Date(y,m-1,d+n))};
+const $=id=>document.getElementById(id);
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const DEF={
+  examples:true,
+  tasks:[
+    {id:1,name:"Draft methods section",tag:"deep",dur:90,ess:true,done:false},
+    {id:2,name:"Review two papers",tag:"deep",dur:60,ess:false,done:false},
+    {id:3,name:"Sketch figure ideas",tag:"creative",dur:45,ess:false,done:false},
+    {id:4,name:"Lab meeting",tag:"social",dur:60,ess:true,done:false},
+    {id:5,name:"Reply to emails",tag:"shallow",dur:30,ess:true,done:false},
+    {id:6,name:"Walk outside in daylight",tag:"lift",dur:20,ess:false,done:false}
+  ],
+  wake:"07:00",sleep:7,checkins:[],proofs:[],weeks:{},low:null,promptOffset:0,tfIndex:0,
+  habits:[],identities:[],votes:[],cases:[],ladder:{},ladderArea:"general",releases:0,rooms:{}
+};
+let S=Object.assign({},DEF,load()||{});
+const TAGS={deep:"Deep",creative:"Creative",social:"Social",shallow:"Shallow",lift:"Lift"};
+
+// ---------- energy model ----------
+const g=(x,m,s)=>Math.exp(-((x-m)**2)/(2*s*s));
+const wakeH=()=>{const[a,b]=S.wake.split(":").map(Number);return a+b/60};
+function baseEnergy(h){ // h = hours since waking
+  let e=0.32+0.55*g(h,3.5,2.2)+0.42*g(h,10.5,2.0)-0.16*g(h,7.5,1.2)-0.3*Math.min(Math.max((h-13)/4,0),1)-0.22*Math.exp(-h/0.8);
+  const sf=Math.min(Math.max((S.sleep-4)/3.5,0.45),1.05);
+  e=0.12+(e-0.12)*sf;
+  return Math.min(Math.max(e,0.05),1);
+}
+function todaysCheckins(){const t=todayStr();return S.checkins.filter(c=>c.date===t)}
+function energyAt(clock){ // clock hours (e.g. 14.5)
+  const h=clock-wakeH(); let e=baseEnergy(h);
+  const cs=todaysCheckins();
+  if(cs.length){const c=cs[cs.length-1];const obs=(c.energy-1)/4;const delta=obs-baseEnergy(c.clock-wakeH());e+=delta*Math.exp(-Math.abs(clock-c.clock)/3);}
+  return Math.min(Math.max(e,0.03),1);
+}
+const fmt=h=>{h=((h%24)+24)%24;const H=Math.floor(h),M=Math.round((h-H)*60);const hh=(M===60?H+1:H)%24,mm=M===60?0:M;const ap=hh>=12?"pm":"am";return `${(hh%12)||12}:${String(mm).padStart(2,"0")} ${ap}`};
+const nowClock=()=>{const d=new Date();return d.getHours()+d.getMinutes()/60};
+
+// ---------- chart ----------
+function drawCurve(){
+  const svg=document.getElementById("curve");
+  const W=640,H=200,L=34,R=12,T=14,B=30,w0=wakeH(),span=17;
+  const x=c=>L+(c-w0)/span*(W-L-R), y=e=>T+(1-e)*(H-T-B);
+  let pts=[],peaks=[];
+  for(let i=0;i<=span*4;i++){const c=w0+i/4,e=energyAt(c);pts.push([x(c),y(e)]);}
+  let path="M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" L");
+  let area=path+` L${x(w0+span)},${y(0)} L${x(w0)},${y(0)} Z`;
+  // peak windows: e >= 0.7 of max
+  let mx=0;for(let i=0;i<=span*4;i++)mx=Math.max(mx,energyAt(w0+i/4));
+  let inP=false,st=0;for(let i=0;i<=span*4;i++){const c=w0+i/4,hi=energyAt(c)>=mx*0.82;if(hi&&!inP){inP=true;st=c}if((!hi||i===span*4)&&inP){inP=false;peaks.push([st,c])}}
+  let s="";
+  peaks.forEach(p=>{s+=`<rect x="${x(p[0])}" y="${T}" width="${x(p[1])-x(p[0])}" height="${H-T-B}" fill="var(--tide-soft)"/>`});
+  [0,.5,1].forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-dasharray="3 4"/>`});
+  s+=`<text x="${L-6}" y="${y(1)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">High</text>`;
+  s+=`<text x="${L-6}" y="${y(0)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">Low</text>`;
+  for(let k=0;k<=span;k+=2){const c=w0+k;s+=`<text x="${x(c)}" y="${H-10}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">${fmt(c).replace(":00","")}</text>`}
+  s+=`<path d="${area}" fill="var(--tide)" opacity=".10"/><path d="${path}" fill="none" stroke="var(--tide)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const n=nowClock();
+  if(n>=w0&&n<=w0+span){s+=`<line x1="${x(n)}" x2="${x(n)}" y1="${T}" y2="${H-B}" stroke="var(--ink)" stroke-width="1"/><circle cx="${x(n)}" cy="${y(energyAt(n))}" r="5" fill="var(--ink)"/><text x="${x(n)+6}" y="${T+10}" font-size="10" fill="var(--ink)" font-family="JetBrains Mono,monospace">now</text>`}
+  todaysCheckins().forEach(c=>{if(c.clock>=w0&&c.clock<=w0+span)s+=`<circle cx="${x(c.clock)}" cy="${y((c.energy-1)/4)}" r="5" fill="var(--sun)" stroke="var(--surface)" stroke-width="2"/>`});
+  svg.innerHTML=s;
+  const pk=peaks.map(p=>`${fmt(p[0])}–${fmt(p[1])}`).join(" and ");
+  document.getElementById("forecast-note").textContent=(peaks.length?`Best focus windows: ${pk}. `:"")+`Expect a dip around ${fmt(w0+7.5)}.`+(todaysCheckins().length?" Adjusted with your latest check-in.":" Check in to make this more accurate.");
+}
+
+// ---------- tasks ----------
+function renderTasks(){
+  const ul=document.getElementById("tasklist");ul.innerHTML="";
+  document.getElementById("example-tag").hidden=!S.examples;
+  if(!S.tasks.length){ul.innerHTML='<li class="note">No tasks yet. Add one above.</li>'}
+  S.tasks.forEach(t=>{
+    const li=document.createElement("li");li.className="task"+(t.done?" done":"");
+    li.innerHTML=`<input type="checkbox" ${t.done?"checked":""} aria-label="Done" id="d${t.id}"><span class="name">${esc(t.name)} <span class="fit">· ${t.dur} min</span></span><span class="chip t-${t.tag}">${TAGS[t.tag]}</span><span class="row" style="gap:0"><button class="icon-btn ${t.ess?"star":""}" title="Mark essential" aria-label="Toggle essential">${t.ess?"★":"☆"}</button><button class="icon-btn" title="Remove" aria-label="Remove task">×</button></span>`;
+    const [cb]=li.querySelectorAll("input");const [st,rm]=li.querySelectorAll("button");
+    cb.onchange=()=>{t.done=cb.checked;commit()};
+    st.onclick=()=>{t.ess=!t.ess;commit()};
+    rm.onclick=()=>{S.tasks=S.tasks.filter(x=>x!==t);commit()};
+    ul.appendChild(li);
+  });
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+// ---------- scheduler ----------
+function isLow(){
+  if(S.low!==null&&S.lowDate===todayStr())return S.low;
+  const cs=todaysCheckins();if(!cs.length)return false;const c=cs[cs.length-1];return c.energy<=2||c.mood<=2;
+}
+function plan(){
+  const w0=wakeH(),start=Math.max(w0+1,Math.ceil(nowClock()*2)/2),end=w0+15.5;
+  const slots=[];for(let c=start;c<end;c+=0.5)slots.push({c,e:energyAt(c+0.25),used:false});
+  let tasks=S.tasks.filter(t=>!t.done);
+  const low=isLow();
+  if(low){const ess=tasks.filter(t=>t.ess).slice(0,3);const lift=tasks.find(t=>t.tag==="lift")||{id:-1,name:"10-minute walk or stretch",tag:"lift",dur:15};tasks=[...ess,lift]}
+  const order={deep:0,creative:1,social:2,shallow:3,lift:4};
+  tasks=[...tasks].sort((a,b)=>(b.ess-a.ess)||(order[a.tag]-order[b.tag]));
+  const out=[],left=[];
+  tasks.forEach(t=>{
+    const n=Math.ceil(t.dur/30);let best=-1,score=-1e9;
+    for(let i=0;i+n<=slots.length;i++){
+      let ok=true,avg=0;for(let k=0;k<n;k++){if(slots[i+k].used){ok=false;break}avg+=slots[i+k].e}
+      if(!ok)continue;avg/=n;
+      let sc= t.tag==="deep"?avg: t.tag==="creative"?avg-0.15*Math.abs(avg-0.7): t.tag==="social"?-Math.abs(avg-0.6): t.tag==="shallow"?-avg: -avg-0.1*Math.abs(slots[i].c-(w0+7.5));
+      sc-=i*0.002; // gentle preference for earlier
+      if(sc>score){score=sc;best=i}
+    }
+    if(best<0){left.push(t);return}
+    for(let k=0;k<n;k++)slots[best+k].used=true;
+    out.push({t,c:slots[best].c,e:slots[best].e});
+  });
+  out.sort((a,b)=>a.c-b.c);
+  return {out,left,low};
+}
+function fitText(t,e){
+  const lvl=e>0.7?"high":e>0.45?"medium":"low";
+  const why={deep:"needs your sharpest focus",creative:"good with some energy to play",social:"people time fits mid energy",shallow:"low-effort work fits a dip",lift:"a lift where energy sags"};
+  return `${lvl} energy · ${why[t.tag]}`;
+}
+function renderPlan(){
+  const {out,left,low}=plan();const el=document.getElementById("plan");
+  document.getElementById("lowtoggle").checked=low;
+  const lb=document.getElementById("lowbat");lb.hidden=!low;
+  if(low&&S.proofs.length){const p=S.proofs[Math.floor(Math.random()*S.proofs.length)];document.getElementById("lowbat-proof").innerHTML=`<div class="proof"><time>${p.date} · a reminder from you</time>${esc(p.text)}</div>`}else document.getElementById("lowbat-proof").innerHTML="";
+  if(!out.length){el.innerHTML=`<p class="note">${S.tasks.filter(t=>!t.done).length?"No time left today for these. Tomorrow is fine.":"All done or nothing planned. Enjoy the rest of your day."}</p>`;return}
+  el.innerHTML=out.map(o=>`<div class="slot"><time>${fmt(o.c)}</time><div><div class="what"><strong>${esc(o.t.name)}</strong><span class="chip t-${o.t.tag}">${TAGS[o.t.tag]}</span></div><div class="fit">${o.t.dur} min · ${fitText(o.t,o.e)}</div></div></div>`).join("")+(left.length?`<p class="note">Didn't fit today: ${left.map(t=>esc(t.name)).join(", ")}. Moving them to tomorrow is a plan, not a failure.</p>`:"");
+}
+
+// ---------- check-in ----------
+let ciE=0,ciM=0;
+function buildScale(id,labels,set){
+  const el=document.getElementById(id);el.innerHTML="";
+  labels.forEach((lab,i)=>{const b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed","false");b.innerHTML=`<b>${i+1}</b>${lab}`;b.onclick=()=>{[...el.children].forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");set(i+1)};el.appendChild(b)});
+}
+buildScale("sc-energy",["Drained","Low","Okay","Good","Charged"],v=>ciE=v);
+buildScale("sc-mood",["Very low","Low","Neutral","Good","Great"],v=>ciM=v);
+const CRISIS=/(suicid|kill myself|end it all|end my life|want to die|self.?harm|hurt myself|no reason to live|better off without me|can'?t go on)/i;
+document.getElementById("ci-save").onclick=()=>{
+  const msg=document.getElementById("ci-msg");
+  if(!ciE||!ciM){msg.textContent="Pick a number for energy and mood.";return}
+  const note=document.getElementById("ci-note").value.trim();
+  S.checkins.push({date:todayStr(),clock:nowClock(),energy:ciE,mood:ciM,note});
+  S.low=null;
+  const recentLow=S.checkins.slice(-3).length===3&&S.checkins.slice(-3).every(c=>c.mood===1);
+  document.getElementById("support").hidden=!(CRISIS.test(note)||recentLow);
+  msg.textContent=ciE<=2||ciM<=2?"Saved. Today's plan is now lighter.":"Saved. Your forecast is updated.";
+  document.getElementById("ci-note").value="";ciE=ciM=0;
+  document.querySelectorAll(".scale button").forEach(b=>b.setAttribute("aria-pressed","false"));
+  commit();
+};
+function renderHist(){
+  const el=document.getElementById("hist");const cs=S.checkins.slice(-10).reverse();
+  if(!cs.length){el.innerHTML='<p class="note">Your check-ins will show here. Try three a day for a week: morning, after lunch, evening.</p>';document.getElementById("pattern").textContent="";return}
+  el.innerHTML='<div class="hrow eyebrow"><span>When</span><span>Energy</span><span>Mood</span></div>'+cs.map(c=>`<div class="hrow"><time>${c.date.slice(5)} ${fmt(c.clock)}</time><div class="bar"><span style="width:${c.energy*20}%;background:var(--tide)"></span></div><div class="bar"><span style="width:${c.mood*20}%;background:var(--sun)"></span></div></div>`).join("");
+  const all=S.checkins;
+  if(all.length>=5){const am=all.filter(c=>c.clock<12),pm=all.filter(c=>c.clock>=12);const avg=a=>a.reduce((s,c)=>s+c.mood,0)/a.length;
+    let t=`Average mood ${avg(all).toFixed(1)} of 5 across ${all.length} check-ins.`;
+    if(am.length&&pm.length){const d=avg(am)-avg(pm);if(Math.abs(d)>=0.5)t+=` Your mood tends to be ${d>0?"better in the morning":"better after noon"}.`}
+    document.getElementById("pattern").textContent=t}
+  else document.getElementById("pattern").textContent=`${5-all.length} more check-in${5-all.length>1?"s":""} until you see patterns.`;
+}
+
+// ---------- reflect ----------
+const PROMPTS=["What's one thing you handled today, even if it was small?","When did you help someone or make their day a bit easier?","What did you do today that past-you would have found hard?","What's one thing you're a little better at than a month ago?","What problem did you work through, even partly?","When did you keep going even though you didn't feel like it?","What's one kind thing you did for yourself today?","Who would say thank you to you for something this week, and for what?","What did you learn today, however small?","What's something you finished, started, or tidied up?"];
+function dayIdx(){return Math.floor(Date.now()/864e5)}
+function renderPrompt(){document.getElementById("prompt").textContent=PROMPTS[(dayIdx()+S.promptOffset)%PROMPTS.length]}
+document.getElementById("pr-skip").onclick=()=>{S.promptOffset++;commit()};
+document.getElementById("pr-save").onclick=()=>{
+  const a=document.getElementById("pr-answer"),v=a.value.trim(),m=document.getElementById("pr-msg");
+  if(!v){m.textContent="Write one small thing first.";return}
+  S.proofs.unshift({date:todayStr(),q:document.getElementById("prompt").textContent,text:v});a.value="";m.textContent="Saved. That's real evidence.";commit();
+};
+function renderProofs(){
+  const ul=document.getElementById("proofs");
+  ul.innerHTML=S.proofs.length?S.proofs.slice(0,30).map(p=>`<li class="proof"><time>${p.date}</time>${esc(p.text)}</li>`).join(""):'<li class="note">Your answers collect here. On low days, ebb shows you one of them as a reminder.</li>';
+}
+const WQ=["I kept going this week even when things were hard.","I did at least one thing I'm glad I did.","I was kind to someone, including myself."];
+function weekKey(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return localDate(d)}
+const wkVals=[0,0,0];
+function renderWeek(){
+  const el=document.getElementById("weekq");el.innerHTML="";
+  const cur=S.weeks[weekKey()];
+  WQ.forEach((q,i)=>{const d=document.createElement("div");d.innerHTML=`<h3 style="margin-bottom:6px">${q}</h3><div class="scale" id="wq${i}"></div>`;el.appendChild(d);
+    buildScale("wq"+i,["","","","",""],v=>wkVals[i]=v);
+    if(cur){wkVals[i]=cur[i];document.getElementById("wq"+i).children[cur[i]-1].setAttribute("aria-pressed","true")}});
+  const keys=Object.keys(S.weeks).sort().slice(-8);
+  const wrap=document.getElementById("wk-chart-wrap");wrap.hidden=!keys.length;
+  document.getElementById("wk-chart").innerHTML=keys.map(k=>{const v=S.weeks[k],a=(v[0]+v[1]+v[2])/3;return `<div style="height:${a/5*100}%" title="${a.toFixed(1)}"></div>`}).join("");
+  document.getElementById("wk-labels").innerHTML=keys.map(k=>`<span>${k.slice(5)}</span>`).join("");
+}
+document.getElementById("wk-save").onclick=()=>{
+  const m=document.getElementById("wk-msg");if(wkVals.some(v=>!v)){m.textContent="Answer all three.";return}
+  S.weeks[weekKey()]=[...wkVals];m.textContent="Saved for this week.";commit();
+};
+
+// ---------- thought flip ----------
+const CARDS=[
+ {trap:"All-or-nothing",w:"Seeing things as total success or total failure, with nothing in between.",t:"I didn't finish everything, so today was a waste.",opts:["Today was a complete failure.","I got some things done, and the rest can move to tomorrow.","I should never plan anything."],a:1},
+ {trap:"Mind reading",w:"Assuming you know what someone else thinks, without real evidence.",t:"My supervisor thinks I'm not good enough.",opts:["I don't know what they think. I could ask for specific feedback.","Everyone thinks I'm not good enough.","I must avoid them from now on."],a:0},
+ {trap:"Catastrophizing",w:"Jumping to the worst possible outcome and treating it as likely.",t:"If this experiment fails, my whole career is over.",opts:["Failing would prove I'm useless.","I'd better not run it at all.","Failed experiments are normal. I'd learn something and try another way."],a:2},
+ {trap:"Labeling",w:"Turning one action into a judgment of your whole self.",t:"I made a mistake. I'm such an idiot.",opts:["I made a mistake, like everyone does. I can fix it or learn from it.","I'm an idiot and always will be.","Mistakes mean I shouldn't try new things."],a:0},
+ {trap:"Overgeneralizing",w:"Taking one or two events and deciding it is always like this.",t:"Nothing ever goes right for me.",opts:["Everything always goes wrong.","Some things went wrong today, and some things have gone right before.","There's no point trying."],a:1},
+ {trap:"Should statements",w:"Holding yourself to rigid rules about how you must be.",t:"I should be as productive as everyone else.",opts:["I'm lazy compared to everyone.","I should work twice as hard tonight.","People work at different paces. I can focus on my own progress."],a:2},
+ {trap:"Discounting the positive",w:"Explaining away good things so they do not count.",t:"They only praised my work to be nice.",opts:["They might actually mean it. I can take the compliment.","Praise never means anything.","I should stop sharing my work."],a:0},
+ {trap:"Emotional reasoning",w:"Treating a feeling as proof that something is true.",t:"I feel anxious, so something bad must be about to happen.",opts:["Feelings are always right.","Anxiety is a feeling, not a forecast. I can notice it and keep going.","I should cancel everything today."],a:1}
+];
+function renderTF(){
+  const c=CARDS[S.tfIndex%CARDS.length];
+  document.getElementById("tf-card").classList.remove("flipped");
+  document.getElementById("tf-trap").textContent="Thinking trap: "+c.trap;
+  document.getElementById("tf-thought").textContent="“"+c.t+"”";
+  $("tf-backtrap").textContent=c.trap;$("tf-why").textContent=c.w;
+  document.getElementById("tf-count").textContent=`Card ${S.tfIndex%CARDS.length+1} of ${CARDS.length}`;
+  document.getElementById("tf-feedback").textContent="Tap the more balanced way to see it.";
+  document.getElementById("tf-next").hidden=true;
+  const o=document.getElementById("tf-opts");o.innerHTML="";
+  c.opts.forEach((txt,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=txt;b.onclick=()=>{
+    if(i===c.a){document.getElementById("tf-card").classList.add("flipped");document.getElementById("tf-feedback").textContent="Balanced: “"+c.opts[c.a]+"” It's true and kind at the same time.";document.getElementById("tf-next").hidden=false;o.querySelectorAll("button").forEach(x=>x.disabled=true)}
+    else{b.classList.add("nope");document.getElementById("tf-feedback").textContent="That one still carries the trap. Try another."}
+  };o.appendChild(b)});
+}
+document.getElementById("tf-next").onclick=()=>{S.tfIndex++;commit()};
+
+// ---------- breathing balloon ----------
+let brTimer=null;
+document.getElementById("br-start").onclick=()=>{
+  const bal=document.getElementById("balloon"),ph=document.getElementById("br-phase"),ct=document.getElementById("br-count"),btn=document.getElementById("br-start");
+  if(brTimer){clearTimeout(brTimer);brTimer=null;bal.className="balloon";bal.style.transform="";ph.textContent="Stopped. Start again anytime.";ct.textContent="";btn.textContent="Start";return}
+  const rounds=+document.getElementById("br-rounds").value;btn.textContent="Stop";
+  const phases=[["Breathe in",1],["Hold",1],["Breathe out",.55],["Hold",.55]];
+  let r=0,p=0,sec=4;bal.className="balloon";
+  function tick(){
+    if(sec===4){const [name,sc]=phases[p];bal.style.transform=`scale(${sc})`;ph.textContent=name}
+    ct.textContent=`Round ${r+1} of ${rounds} · ${sec}`;
+    sec--;
+    if(sec===0){sec=4;p++;if(p===4){p=0;r++;if(r===rounds){brTimer=setTimeout(()=>{bal.style.transform="";bal.classList.add("float");ph.textContent="Nicely done. Notice how you feel.";ct.textContent="";btn.textContent="Start";brTimer=null},1000);return}}}
+    brTimer=setTimeout(tick,1000);
+  }
+  tick();
+};
+
+// ---------- games hub ----------
+const GAMES=[
+ {id:"reef",name:"Reef Builder",tag:"Stack tiny habits and grow a coral reef.",src:"Atomic Habits"},
+ {id:"id",name:"Identity Votes",tag:"Every small action is a vote for who you're becoming.",src:"Atomic Habits"},
+ {id:"room",name:"Room Rearrange",tag:"Move things so good habits take less effort.",src:"Atomic Habits"},
+ {id:"det",name:"Habit Loop Detective",tag:"Crack the cue, craving and reward behind a habit.",src:"Atomic Habits"},
+ {id:"ladder",name:"Believability Ladder",tag:"Kinder self-talk, one believable step at a time.",src:"You Can Heal Your Life"},
+ {id:"let",name:"Letting Go",tag:"Write down what you're carrying, then release it.",src:"You Can Heal Your Life"},
+ {id:"flip",name:"Thought Flip",tag:"Spot thinking traps and find the balanced view.",src:"CBT"},
+ {id:"breath",name:"Breathing Balloon",tag:"Box breathing to settle your body.",src:"Breathwork"}
+];
+const GLYPH={
+ reef:'<rect x="4" y="37" width="36" height="5" rx="2.5" fill="var(--sand)"/><path d="M22 38V20M22 27l-7-8M22 23l6-9M15 19l-3-6M28 14l3-5" stroke="var(--coral-a)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="34" cy="33" r="4" fill="var(--coral-d)"/><circle cx="9" cy="33" r="3" fill="var(--coral-b)"/>',
+ id:'<path d="M14 9h16v4c4 2 6 6 6 10v13a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V23c0-4 2-8 6-10z" fill="none" stroke="var(--tide)" stroke-width="2.5"/><circle cx="17" cy="33" r="3.5" fill="var(--sun)"/><circle cx="26" cy="33" r="3.5" fill="var(--sun)"/><circle cx="21.5" cy="26" r="3.5" fill="var(--sun)"/>',
+ room:'<rect x="5" y="5" width="34" height="34" rx="2" fill="none" stroke="var(--ink)" stroke-width="2.5"/><path d="M22 5v14M5 22h14" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="25" y="25" width="10" height="10" rx="2" fill="var(--tide)"/><circle cx="12" cy="12" r="4" fill="var(--sun)"/>',
+ det:'<circle cx="19" cy="19" r="11" fill="none" stroke="var(--social)" stroke-width="3"/><path d="M27 27l10 10" stroke="var(--social)" stroke-width="4" stroke-linecap="round"/><path d="M13.5 19a5.5 5.5 0 0 1 5.5-5.5" stroke="var(--social)" stroke-width="2" fill="none" stroke-linecap="round"/>',
+ ladder:'<path d="M14 4v36M30 4v36" stroke="var(--creative)" stroke-width="3" stroke-linecap="round"/><path d="M14 12h16M14 21h16M14 30h16" stroke="var(--creative)" stroke-width="3"/>',
+ let:'<ellipse cx="22" cy="15" rx="10" ry="12" fill="var(--sun)"/><path d="M22 27c-2 4 2 5 0 9" stroke="var(--muted)" stroke-width="1.5" fill="none"/><rect x="16" y="35" width="12" height="7" rx="1" fill="var(--paper)" stroke="var(--muted)"/>',
+ flip:'<rect x="6" y="10" width="20" height="28" rx="3" fill="var(--ink)"/><rect x="18" y="6" width="20" height="28" rx="3" fill="var(--tide-soft)" stroke="var(--tide)" stroke-width="2"/>',
+ breath:'<circle cx="22" cy="22" r="17" fill="none" stroke="var(--tide)" stroke-width="2" opacity=".35"/><circle cx="22" cy="22" r="11" fill="none" stroke="var(--tide)" stroke-width="2.5"/><circle cx="22" cy="22" r="4.5" fill="var(--tide)"/>'
+};
+let curGame=null;
+const plural=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
+function tileStat(id){
+  if(id==="reef")return plural(S.habits.length,"habit");
+  if(id==="id")return plural(S.identities.reduce((a,x)=>a+x.votes,0),"vote");
+  if(id==="room")return `${Object.keys(S.rooms).filter(k=>S.rooms[k].real).length} of 3 rooms`;
+  if(id==="det")return `${S.cases.length} solved`;
+  if(id==="ladder")return `${Object.values(S.ladder).reduce((a,b)=>a+b,0)} of 25 rungs`;
+  if(id==="let")return `${S.releases} released`;
+  if(id==="flip")return plural(CARDS.length,"card");
+  return "1–3 min";
+}
+function renderHub(){
+  $("hub").innerHTML=GAMES.map(g=>`<button class="tile" data-g="${g.id}"><svg viewBox="0 0 44 44" aria-hidden="true">${GLYPH[g.id]}</svg><h3>${g.name}</h3><p>${g.tag}</p><div class="meta"><span>${g.src}</span><b>${tileStat(g.id)}</b></div></button>`).join("");
+  $("hub").querySelectorAll(".tile").forEach(b=>b.onclick=()=>openGame(b.dataset.g));
+}
+function showHub(){curGame=null;$("hubwrap").hidden=false;$("g-back").hidden=true;document.querySelectorAll(".game").forEach(g=>g.hidden=true);renderHub()}
+function openGame(id){curGame=id;$("hubwrap").hidden=true;$("g-back").hidden=false;document.querySelectorAll(".game").forEach(g=>g.hidden=g.id!=="g-"+id);renderGames();window.scrollTo(0,0)}
+$("g-back").onclick=()=>{showHub();window.scrollTo(0,0)};
+function renderGames(){
+  if(!curGame){renderHub();return}
+  ({reef:renderReef,id:renderIdentity,room:renderRoom,det:renderDet,ladder:renderLadder,let:()=>{if(!lgBusy)renderLet()}}[curGame]||(()=>{}))();
+}
+function chipRow(el,list,fn){el.innerHTML="";list.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip-btn";b.textContent=t;b.onclick=()=>fn(t);el.appendChild(b)})}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+// ---------- 1. Reef Builder ----------
+const CORALS=["var(--coral-a)","var(--coral-b)","var(--coral-c)","var(--coral-d)"];
+function habitStatus(h){
+  const t=todayStr(),y=addDays(t,-1),y2=addDays(t,-2);
+  if(h.days[t])return"done";
+  if(!h.days[y]&&!h.days[y2]&&y2>=h.created)return"faded";
+  if(!h.days[y]&&y>=h.created)return"missed";
+  return"pending";
+}
+const STATUS_TXT={done:"Done today. Your coral grew.",missed:"Missed yesterday. Doing it today keeps it going.",faded:"Two days missed, so one piece faded. Do it today and it comes back.",pending:"Not done yet today."};
+function habitLine(h){return `${esc(h.lead||"After I")} ${esc(h.cue)}, I will ${esc(h.tiny)}.`}
+function renderReef(){
+  let s=`<defs><linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sea)"/><stop offset="1" style="stop-color:var(--sea-deep)"/></linearGradient></defs><rect width="600" height="260" fill="url(#seaG)"/>`;
+  [[90,0.07],[260,0.05],[430,0.06]].forEach(([x,o])=>{s+=`<polygon points="${x},0 ${x+50},0 ${x+120},230 ${x+40},230" fill="var(--surface)" opacity="${o}"/>`});
+  s+=`<path d="M0 226 Q150 210 300 222 T600 216 V260 H0Z" fill="var(--sand)"/>`;
+  [[40,226],[560,220]].forEach(([x,y])=>{s+=`<path d="M${x} ${y} q-8 -20 0 -40 q8 -20 0 -40" stroke="var(--coral-d)" stroke-width="4" fill="none" stroke-linecap="round" opacity=".55"/>`});
+  const pieces=[];
+  S.habits.forEach((h,hi)=>{
+    const days=Object.keys(h.days).filter(d=>h.days[d]).sort();const st=habitStatus(h);
+    days.forEach((d,di)=>{const r=rng(h.id%100000+di*977+hi*31);pieces.push({x:70+r()*460,yb:226+r()*10,h:30+r()*50+Math.min(di,20),type:hi%4,col:CORALS[hi%4],faded:st==="faded"&&di===days.length-1,r})});
+  });
+  pieces.sort((a,b)=>b.h-a.h).slice(0,90).forEach(p=>{
+    const {x,yb,h,col}=p,op=p.faded?0.22:1;
+    if(p.type===0)s+=`<g stroke="${col}" stroke-width="5" stroke-linecap="round" fill="none" opacity="${op}"><path d="M${x} ${yb}V${yb-h}"/><path d="M${x} ${yb-h*.45}L${x-h*.32} ${yb-h*.82}"/><path d="M${x} ${yb-h*.62}L${x+h*.3} ${yb-h*.96}"/></g>`;
+    else if(p.type===1)s+=`<g fill="${col}" opacity="${op}"><ellipse cx="${x}" cy="${yb-h*.3}" rx="${h*.42}" ry="${h*.3}"/><ellipse cx="${x-h*.25}" cy="${yb-h*.15}" rx="${h*.25}" ry="${h*.18}"/></g>`;
+    else if(p.type===2)s+=`<path d="M${x} ${yb}Q${x-h*.65} ${yb-h*.9} ${x} ${yb-h}Q${x+h*.65} ${yb-h*.9} ${x} ${yb}Z" fill="${col}" opacity="${op*0.85}"/>`;
+    else s+=`<g fill="${col}" opacity="${op}"><rect x="${x-10}" y="${yb-h*.7}" width="7" height="${h*.7}" rx="3.5"/><rect x="${x-1}" y="${yb-h}" width="7" height="${h}" rx="3.5"/><rect x="${x+8}" y="${yb-h*.5}" width="7" height="${h*.5}" rx="3.5"/></g>`;
+  });
+  for(let i=0;i<Math.min(pieces.length,8);i++){const r=rng(i*13+5);s+=`<circle cx="${80+r()*440}" cy="${30+r()*120}" r="${2+r()*4}" fill="none" stroke="var(--surface)" stroke-width="1.5" opacity=".7"/>`}
+  if(!pieces.length)s+=`<text x="300" y="120" text-anchor="middle" font-size="15" fill="var(--ink)" font-family="Figtree,sans-serif">Your reef grows here.</text><text x="300" y="142" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Figtree,sans-serif">Plant a habit below and check it off today.</text>`;
+  else s+=`<text x="14" y="22" font-size="11" fill="var(--ink)" font-family="JetBrains Mono,monospace">${plural(pieces.length,"piece")} of coral</text>`;
+  $("reef-svg").innerHTML=s;
+  const ul=$("reef-list");ul.innerHTML="";
+  if(!S.habits.length)ul.innerHTML='<li class="note">No habits yet. Start with one tiny habit stacked on something you already do.</li>';
+  S.habits.forEach(h=>{
+    const st=habitStatus(h),done=st==="done",n=Object.values(h.days).filter(Boolean).length;
+    let dots="";for(let i=13;i>=0;i--){const d=addDays(todayStr(),-i);dots+=`<i class="${h.days[d]?"on":""}" title="${d}"></i>`}
+    const li=document.createElement("li");li.className="habit";
+    li.innerHTML=`<div class="hbody"><strong>${habitLine(h)}</strong><div class="fit">${STATUS_TXT[st]} · ${plural(n,"day")}</div><div class="dots" aria-label="Last 14 days">${dots}</div></div><button class="btn ${done?"":"primary"}">${done?"Undo":"Did it today"}</button><button class="icon-btn" aria-label="Remove habit">×</button>`;
+    const [b,rm]=li.querySelectorAll("button");
+    b.onclick=()=>{h.days[todayStr()]=!done;commit()};
+    rm.onclick=()=>{S.habits=S.habits.filter(x=>x!==h);commit()};
+    ul.appendChild(li);
+  });
+  chipRow($("rf-cues"),["make my morning tea","open my laptop","finish lunch","brush my teeth at night"],t=>$("rf-cue").value=t);
+}
+$("reef-form").onsubmit=e=>{
+  e.preventDefault();const m=$("rf-msg");
+  if(!$("rf-two").checked){m.textContent="Shrink it until it takes two minutes, then tick the box. \"Exercise\" becomes \"put on my running shoes\".";return}
+  S.habits.push({id:Date.now(),lead:"After I",cue:$("rf-cue").value.trim(),tiny:$("rf-habit").value.trim(),created:todayStr(),days:{}});
+  $("rf-cue").value="";$("rf-habit").value="";$("rf-two").checked=false;m.textContent="Planted. Check it off when you do it.";commit();
+};
+
+// ---------- 2. Identity Votes ----------
+let lastVoteFor=null;
+const LEVELS=[[0,"Just started",5],[5,"Building",15],[15,"Regular",35],[35,"Committed",70],[70,"It's who I am",Infinity]];
+function level(n){return LEVELS.filter(l=>n>=l[0]).pop()}
+function jarSVG(n,isNew){
+  let s=`<svg viewBox="0 0 120 150" aria-hidden="true"><path d="M32 12h56v12c14 8 20 20 20 34v74a10 10 0 0 1-10 10H22a10 10 0 0 1-10-10V58c0-14 6-26 20-34z" fill="var(--tide-soft)" stroke="var(--tide)" stroke-width="3"/><rect x="28" y="6" width="64" height="9" rx="3" fill="var(--tide)"/>`;
+  const shown=Math.min(n,56);
+  for(let i=0;i<shown;i++){const row=Math.floor(i/7),col=i%7,off=row%2?6:0;const x=24+col*12+off-(row%2?3:0),y=132-row*11;
+    s+=`<circle cx="${Math.min(x,98)}" cy="${y}" r="5.5" fill="var(--sun)" stroke="var(--surface)" stroke-width="1"${isNew&&i===shown-1?' class="tok-new"':""}/>`}
+  return s+"</svg>";
+}
+function renderIdentity(){
+  const jars=$("jars");
+  if(!S.identities.length)jars.innerHTML='<p class="note" style="margin:0">No jars yet. Add who you\'re becoming below, for example "someone who moves every day".</p>';
+  else{jars.innerHTML="";S.identities.forEach(it=>{
+    const lv=level(it.votes),d=document.createElement("div");d.className="jar";
+    d.innerHTML=`<button class="icon-btn" aria-label="Remove identity">×</button>${jarSVG(it.votes,lastVoteFor===it.id)}<strong>I'm ${esc(it.name)}</strong><span class="lvl">${lv[1]}</span><span class="fit">${plural(it.votes,"vote")}${lv[2]!==Infinity?` · ${lv[2]-it.votes} to next level`:""}</span>`;
+    d.querySelector("button").onclick=()=>{S.identities=S.identities.filter(x=>x!==it);commit()};jars.appendChild(d)})}
+  lastVoteFor=null;
+  $("iv-card").hidden=!S.identities.length;
+  const sel=$("iv-who"),prev=sel.value;sel.innerHTML=S.identities.map(it=>`<option value="${it.id}">${esc(it.name)}</option>`).join("");if(prev)sel.value=prev;
+  const t=todayStr();
+  const quick=[...S.tasks.filter(x=>x.done).map(x=>x.name),...S.habits.filter(h=>h.days[t]).map(h=>h.tiny),...S.proofs.filter(p=>p.date===t).map(p=>p.text)].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,6);
+  const q=$("iv-quick");q.innerHTML="";
+  if(quick.length){const lab=document.createElement("div");lab.className="eyebrow";lab.style.marginBottom="6px";lab.textContent="Things you did today · tap to vote";q.appendChild(lab);const r=document.createElement("div");r.className="row chips";q.appendChild(r);chipRow(r,quick.map(x=>x.length>48?x.slice(0,46)+"…":x),txt=>{$("iv-what").value=txt;castVote()})}
+  $("iv-log").innerHTML=S.votes.slice(0,6).map(v=>`<li class="proof"><time>${v.date} · ${esc(v.who)}</time>${esc(v.what)}</li>`).join("");
+  chipRow($("id-sugg"),["someone who moves every day","a person who writes daily","someone who's kind to myself","someone who keeps promises to myself"].filter(x=>!S.identities.some(i=>i.name===x)),t=>{$("id-name").value=t});
+}
+function castVote(){
+  const it=S.identities.find(x=>String(x.id)===$("iv-who").value),what=$("iv-what").value.trim();
+  if(!it){return}if(!what){$("iv-msg").textContent="Write what you did, even something small.";return}
+  it.votes++;S.votes.unshift({date:todayStr(),who:it.name,what});S.votes=S.votes.slice(0,100);lastVoteFor=it.id;
+  $("iv-what").value="";$("iv-msg").textContent=`Vote cast. That's evidence you're ${it.name}.`;commit();
+}
+$("iv-cast").onclick=castVote;
+$("iv-what").onkeydown=e=>{if(e.key==="Enter")castVote()};
+$("id-form").onsubmit=e=>{e.preventDefault();const n=$("id-name").value.trim();if(!n)return;
+  if(S.identities.length>=3){$("iv-msg").textContent="";$("id-name").value="";alertNote("id-sugg","Three is the limit. Remove one to add another.");return}
+  S.identities.push({id:Date.now(),name:n.replace(/^i'?m\s+/i,""),votes:0});$("id-name").value="";commit()};
+function alertNote(afterId,txt){const el=$(afterId);el.innerHTML=`<span class="note">${txt}</span>`}
+
+// ---------- 3. Room Rearrange ----------
+const ROOMS={
+ phone:{title:"Less scrolling at night",good:"Ease of reading before sleep",bad:"Effort to start scrolling",zones:["Bed","Bedside table","Desk","Hallway"],items:[
+  {id:"phone",name:"Phone",start:0,z:[[0,0],[0,1],[0,2],[0,3]],act:{2:"Leave your phone on the desk tonight, away from the bed.",3:"Leave your phone in the hallway tonight."}},
+  {id:"charger",name:"Phone charger",start:1,z:[[0,0],[0,0],[0,1],[0,3]],act:{2:"Move your phone charger to the desk.",3:"Plug your charger in outside the bedroom."}},
+  {id:"book",name:"A book you like",start:2,z:[[3,0],[3,0],[1,0],[0,0]],act:{0:"Put a book on your pillow before evening.",1:"Keep a book on your bedside table."}},
+  {id:"lamp",name:"Reading lamp",start:2,z:[[1,0],[2,0],[0,0],[0,0]],act:{1:"Set up a reading lamp beside your bed."}}]},
+ writing:{title:"Start writing in the morning",good:"Ease of starting to write",bad:"Effort to get distracted",zones:["Desk","Bed","Kitchen","Drawer"],items:[
+  {id:"laptop",name:"Laptop, draft open",start:1,z:[[3,0],[1,0],[1,0],[0,0]],act:{0:"Before bed, leave your laptop on the desk with tomorrow's draft open."}},
+  {id:"phone",name:"Phone",start:0,z:[[0,0],[0,0],[0,2],[0,3]],act:{2:"Leave your phone in the kitchen while you write.",3:"Put your phone in a drawer until you've written one paragraph."}},
+  {id:"note",name:"Note with first sentence",start:3,z:[[2,0],[0,0],[1,0],[0,0]],act:{0:"Write tomorrow's first sentence on a sticky note and stick it on the screen."}},
+  {id:"head",name:"Headphones",start:3,z:[[1,1],[0,0],[0,0],[0,0]],act:{0:"Keep headphones on the desk to block out noise."}}]},
+ water:{title:"Drink more water",good:"Ease of drinking water",bad:"Effort to grab a sugary drink",zones:["Desk","Kitchen counter","Back of cupboard","Bag"],items:[
+  {id:"bottle",name:"Water bottle",start:1,z:[[3,0],[1,0],[0,0],[2,0]],act:{0:"Keep a filled water bottle on your desk.",3:"Pack a water bottle in your bag every morning."}},
+  {id:"soda",name:"Soft drinks",start:1,z:[[0,0],[0,0],[0,3],[0,0]],act:{2:"Move soft drinks to the back of the cupboard."}},
+  {id:"glass",name:"Clean glass",start:2,z:[[2,0],[2,0],[0,0],[0,0]],act:{0:"Keep a glass on your desk.",1:"Leave a clean glass next to the tap."}},
+  {id:"fruit",name:"Fruit bowl",start:2,z:[[1,0],[2,1],[0,0],[1,0]],act:{1:"Put a fruit bowl on the kitchen counter."}}]}
+};
+let roomKey="phone",roomSel=null;
+function roomState(){const R=ROOMS[roomKey];if(!S.rooms[roomKey])S.rooms[roomKey]={pos:Object.fromEntries(R.items.map(i=>[i.id,i.start]))};return S.rooms[roomKey]}
+function renderRoom(){
+  const R=ROOMS[roomKey],st=roomState();
+  const tabs=$("rm-tabs");tabs.innerHTML="";
+  Object.entries(ROOMS).forEach(([k,r])=>{const b=document.createElement("button");b.className="btn";b.setAttribute("aria-pressed",k===roomKey);if(k===roomKey){b.classList.add("primary")}b.textContent=r.title;b.onclick=()=>{roomKey=k;roomSel=null;$("rm-check").hidden=true;renderRoom()};tabs.appendChild(b)});
+  const room=$("room");room.innerHTML="";
+  R.zones.forEach((zn,zi)=>{
+    const z=document.createElement("div");z.className="zone"+(roomSel?" target":"");z.tabIndex=0;z.setAttribute("role","button");z.setAttribute("aria-label","Place here: "+zn);
+    z.innerHTML=`<span class="zl">${zn}</span>`;
+    R.items.filter(it=>st.pos[it.id]===zi).forEach(it=>{const b=document.createElement("button");b.className="item";b.textContent=it.name;b.setAttribute("aria-pressed",roomSel===it.id);
+      b.onclick=e=>{e.stopPropagation();roomSel=roomSel===it.id?null:it.id;renderRoom()};z.appendChild(b)});
+    const place=()=>{if(!roomSel)return;st.pos[roomSel]=zi;roomSel=null;$("rm-check").hidden=true;commit()};
+    z.onclick=place;z.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();place()}};
+    room.appendChild(z);
+  });
+  $("rm-hint").textContent=roomSel?`Now tap where the ${R.items.find(i=>i.id===roomSel).name.toLowerCase()} should go.`:"Tap an item, then tap where it should go.";
+  let g=0,gm=0,b=0,bm=0;R.items.forEach(it=>{const v=it.z[st.pos[it.id]];g+=v[0];b+=v[1];gm+=Math.max(...it.z.map(x=>x[0]));bm+=Math.max(...it.z.map(x=>x[1]))});
+  const pg=Math.round(g/gm*100),pb=Math.round(b/bm*100);
+  $("rm-meters").innerHTML=`<div class="meter"><span>${R.good}</span><b>${pg}%</b><div class="bar"><span style="width:${pg}%;background:var(--tide)"></span></div></div><div class="meter"><span>${R.bad}</span><b>${pb}%</b><div class="bar"><span style="width:${pb}%;background:var(--sun)"></span></div></div>`+(pg>=90&&pb>=90?'<p class="note" style="margin:0">That\'s a great setup. Good habits are easy and the bad one takes effort.</p>':"");
+}
+$("rm-real").onclick=()=>{
+  const R=ROOMS[roomKey],st=roomState();const acts=R.items.map(it=>it.act[st.pos[it.id]]).filter(Boolean);
+  const box=$("rm-check");box.hidden=false;
+  if(!acts.length){box.innerHTML='<p class="note" style="margin:0">Move a few items to better spots first.</p>';return}
+  st.real=true;save();
+  box.innerHTML=`<h3 style="margin-bottom:8px">Do these in your real room</h3><ul class="checklist">${acts.map((a,i)=>`<li><label><input type="checkbox" id="rmc-${roomKey}-${i}">${a}</label></li>`).join("")}</ul>`;
+};
+$("rm-reset").onclick=()=>{delete S.rooms[roomKey];roomSel=null;$("rm-check").hidden=true;commit()};
+
+// ---------- 4. Habit Loop Detective ----------
+const CASES=[
+ {id:"scroll",title:"The Case of the Endless Scroll",habit:"Scrolling social media when I should be working",
+  cue:["I get stuck on a hard task","I feel bored","A notification pops up"],craving:["Relief from feeling stuck","Something new and fun","To feel connected"],
+  response:["Open Instagram or YouTube","Check the news","Read messages"],reward:["A few minutes of distraction","Something new to look at","Feeling less alone"],
+  swaps:["Stand up and stretch for two minutes","Write down the exact sentence I'm stuck on","Message one friend, then put the phone away","Walk to get a glass of water"]},
+ {id:"snack",title:"The Case of the Stress Snack",habit:"Snacking when I'm stressed",
+  cue:["A tense email or meeting","The late-afternoon slump","Seeing snacks on the counter"],craving:["To calm down","A quick energy boost","Comfort"],
+  response:["Grab chips or sweets","Make instant noodles","Eat whatever's in reach"],reward:["A moment of calm","Feeling more awake","Something pleasant"],
+  swaps:["Drink water and take five slow breaths","Eat fruit or nuts kept on my desk","Step outside for three minutes","Make a cup of tea"]},
+ {id:"late",title:"The Case of the Late Night",habit:"Staying up later than I want to",
+  cue:["Getting into bed with my phone","Feeling the day had no free time","Something left unfinished"],craving:["Time that feels like mine","To put off tomorrow","To relax"],
+  response:["Watch one more episode","Scroll in bed","Keep working"],reward:["Feeling free","Tomorrow feels further away","Feeling relaxed"],
+  swaps:["Take 20 minutes of real free time earlier in the evening","Write tomorrow's top task, then close the laptop","Read a paper book in bed instead","Listen to something calm with the screen off"]},
+ {id:"delay",title:"The Case of the Dreaded Task",habit:"Putting off a task I'm dreading",
+  cue:["Seeing it on my list","Thinking about how big it is","Feeling tired"],craving:["To stop feeling anxious","To feel productive with something easier","Rest"],
+  response:["Do easy tasks instead","Tidy my desk","Take a long break"],reward:["Anxiety drops for a while","A sense of getting things done","Feeling rested"],
+  swaps:["Do only the first two minutes of it","Split it into three tiny steps and do step one","Set a 10-minute timer and stop when it rings","Tell someone what I'll do and when"]}
+];
+const CLUES=[["cue","Clue 1 · The cue","What sets it off?"],["craving","Clue 2 · The craving","What do you really want in that moment?"],["response","Clue 3 · The response","What do you actually do?"],["reward","Clue 4 · The reward","What do you get out of it?"]];
+let det={step:0};
+function detLoop(p){return `<div class="loop">${CLUES.map(([k,l])=>`<div class="lb${p[k]?"":" empty"}"><b>${k}</b>${p[k]?esc(p[k]):"?"}</div>`).join("")}</div>`}
+function renderDet(){
+  const el=$("det");
+  if(det.step===0){
+    el.innerHTML=`<p class="note" style="margin:0">Pick a case. Every habit runs on a loop: a cue, a craving, a response and a reward. Find the loop and you can swap the response.</p><div class="casegrid">${CASES.map(c=>`<button class="casebtn" data-c="${c.id}"><b>${c.title}</b><span>${c.habit}</span></button>`).join("")}<button class="casebtn" data-c="own"><b>Open my own case</b><span>A habit of yours that isn't listed</span></button></div>`;
+    el.querySelectorAll(".casebtn").forEach(b=>b.onclick=()=>{
+      if(b.dataset.c==="own"){det={step:-1,picks:{}};}else{det={step:1,c:CASES.find(c=>c.id===b.dataset.c),picks:{}};}renderDet()});
+  }else if(det.step===-1){
+    el.innerHTML=`<div class="casefile"><p class="case-title">A new case</p><label class="f">Which habit do you want to change?<input type="text" id="det-own" placeholder="e.g. checking email first thing in the morning"></label><div class="row"><button class="btn primary" id="det-open">Open the case</button><button class="btn" id="det-x">Back</button></div></div>`;
+    $("det-open").onclick=()=>{const v=$("det-own").value.trim();if(!v)return;det={step:1,c:{id:"own",title:"The Case of "+v.charAt(0).toUpperCase()+v.slice(1),habit:v,cue:[],craving:[],response:[],reward:[],swaps:[]},picks:{}};renderDet()};
+    $("det-x").onclick=()=>{det={step:0};renderDet()};
+  }else if(det.step<=4){
+    const [k,label,q]=CLUES[det.step-1],c=det.c;
+    el.innerHTML=`<div class="casefile"><div class="progress">${[1,2,3,4,5].map(i=>`<i class="${i<=det.step?"on":""}"></i>`).join("")}</div><p class="case-title">${esc(c.title)}</p>${detLoop(det.picks)}<div><div class="eyebrow">${label}</div><h3 style="margin-top:4px">${q}</h3></div><div class="opts" id="det-opts"></div><div class="ownrow"><input type="text" id="det-in" placeholder="Or write your own" aria-label="Your own answer"><button class="btn" id="det-use">Use mine</button></div><div><button class="btn" id="det-back">Back</button></div></div>`;
+    const o=$("det-opts");c[k].forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>{det.picks[k]=t;det.step++;renderDet()};o.appendChild(b)});
+    $("det-use").onclick=()=>{const v=$("det-in").value.trim();if(!v)return;det.picks[k]=v;det.step++;renderDet()};
+    $("det-back").onclick=()=>{det.step--;if(det.step===0)det={step:0};renderDet()};
+  }else if(det.step===5){
+    const c=det.c;
+    el.innerHTML=`<div class="casefile"><div class="progress">${[1,2,3,4,5].map(()=>`<i class="on"></i>`).join("")}</div><p class="case-title">${esc(c.title)}</p>${detLoop(det.picks)}<div><div class="eyebrow">The solution</div><h3 style="margin-top:4px">Keep the cue and the reward. Swap the response for something that gives you "${esc(det.picks.reward.toLowerCase())}".</h3></div><div class="opts" id="det-opts"></div><div class="ownrow"><input type="text" id="det-in" placeholder="Or write your own swap" aria-label="Your own swap"><button class="btn" id="det-use">Use mine</button></div></div>`;
+    const finish=t=>{det.swap=t;det.step=6;S.cases.unshift({date:todayStr(),title:c.title,picks:{...det.picks},swap:t});commit()};
+    c.swaps.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>finish(t);$("det-opts").appendChild(b)});
+    $("det-use").onclick=()=>{const v=$("det-in").value.trim();if(v)finish(v)};
+  }else{
+    const c=det.c,p=det.picks;
+    el.innerHTML=`<div class="casefile"><span class="stamp">CASE CLOSED</span><p class="case-title">${esc(c.title)}</p><p style="margin:0">When <b>${esc(lowerFirst(p.cue))}</b>, instead of <b>${esc(lowerFirst(p.response))}</b>, I'll <b>${esc(lowerFirst(det.swap))}</b>. I still get <b>${esc(lowerFirst(p.reward))}</b>.</p><p class="note" style="margin:0">This isn't a character flaw. It's a loop, and loops can be rewired.</p><div class="row"><button class="btn primary" id="det-reef">Add to my reef</button><button class="btn" id="det-new">New case</button></div><span class="note" id="det-msg" role="status"></span></div>`;
+    $("det-reef").onclick=()=>{S.habits.push({id:Date.now(),lead:"When",cue:lowerFirst(p.cue),tiny:lowerFirst(det.swap),created:todayStr(),days:{}});$("det-reef").disabled=true;save();$("det-msg").textContent="Added to Reef Builder as a habit to check off."};
+    $("det-new").onclick=()=>{det={step:0};renderDet()};
+  }
+  $("det-solved").innerHTML=S.cases.length?S.cases.slice(0,10).map(k=>`<li class="proof"><time>${k.date} · ${esc(k.title)}</time>When ${esc(lowerFirst(k.picks.cue))}, I'll ${esc(lowerFirst(k.swap))}.</li>`).join(""):'<li class="note">Closed cases are filed here.</li>';
+}
+function lowerFirst(t){return /^(I |I'|A notification)/.test(t)?t.replace(/^A /,"a "):t.charAt(0).toLowerCase()+t.slice(1)}
+
+// ---------- 5. Believability Ladder ----------
+const LADDERS={
+ general:{name:"Myself",rungs:["I'm willing to be a bit kinder to myself.","I'm learning to notice when I'm harsh with myself.","I'm doing my best with what I have today.","I'm allowed to have needs and limits.","I'm okay as I am, and I can still grow."]},
+ work:{name:"My work",rungs:["I'm willing to look at my work more fairly.","I've done good work before, even if not every time.","Learning includes getting things wrong.","My worth isn't the same as today's output.","I bring something useful to my work."]},
+ mistakes:{name:"Mistakes",rungs:["I'm willing to look at my mistakes without attacking myself.","Everyone makes mistakes, including me.","A mistake is something I did, not who I am.","I can learn from this and move on.","I can forgive myself and still do better."]},
+ body:{name:"My body",rungs:["I'm willing to speak about my body more gently.","My body gets me through each day.","I can care for my body without criticizing it.","My body deserves rest, food and kindness.","I can appreciate my body as it is today."]},
+ people:{name:"Relationships",rungs:["I'm willing to believe some people care about me.","I've been a good friend to someone.","I can ask for support when I need it.","People can like me even when I'm not perfect.","I deserve to be treated with respect."]}
+};
+let ldJust=false;
+function renderLadder(){
+  const area=S.ladderArea,L=LADDERS[area],idx=S.ladder[area]||0;
+  const ar=$("ld-areas");ar.innerHTML="";
+  Object.entries(LADDERS).forEach(([k,l])=>{const b=document.createElement("button");b.className="btn"+(k===area?" primary":"");b.setAttribute("aria-pressed",k===area);b.textContent=`${l.name} · ${S.ladder[k]||0}/5`;b.onclick=()=>{S.ladderArea=k;commit()};ar.appendChild(b)});
+  $("ladder").innerHTML=L.rungs.map((r,i)=>`<li class="rung ${i<idx?"done":i===idx?"cur"+(ldJust?" just":""):"locked"}"${i>idx?' aria-hidden="true"':""}>${esc(r)}</li>`).join("");
+  ldJust=false;
+  const side=$("ld-side");
+  if(idx>=5){side.innerHTML=`<div class="eyebrow">Top of the ladder</div><p class="say">You climbed all five rungs for ${L.name.toLowerCase()}.</p><p class="note" style="margin:0">Come back to any rung when you need it. Saying it again on a hard day still helps.</p><div><button class="btn" id="ld-restart">Climb again</button></div>`;$("ld-restart").onclick=()=>{S.ladder[area]=0;commit()};return}
+  side.innerHTML=`<div class="eyebrow">Rung ${idx+1} of 5</div><p class="say">“${esc(L.rungs[idx])}”</p><p class="note" style="margin:0">Say it once, slowly. How true does it feel right now?</p><div class="scale" id="ld-scale" role="group" aria-label="How true it feels"></div><p class="note" id="ld-msg" role="status" style="margin:0"></p>`;
+  buildScale("ld-scale",["Not at all","A little","Somewhat","Mostly","Fully"],v=>{
+    if(v>=3){S.ladder[area]=idx+1;ldJust=true;commit();const m=$("ld-msg");if(m)m.textContent=idx+1<5?"You climbed a rung.":""}
+    else{$("ld-msg").innerHTML=v===1&&idx>0?'That\'s okay. This one may be a stretch for now. <button class="btn" id="ld-down" style="margin-top:6px">Step down a rung</button>':"That's okay. Stay on this rung and try it again tomorrow. It often gets easier with repetition.";
+      const d=$("ld-down");if(d)d.onclick=()=>{S.ladder[area]=idx-1;commit()}}
+  });
+}
+
+// ---------- 6. Letting Go ----------
+let lgStep=0,lgText="",lgBusy=false,lgTimer=null;
+function renderLet(){
+  const st=$("lg-step"),bal=$("lg-balloon"),note=$("lg-note"),ph=$("lg-phase");
+  $("lg-count").textContent=S.releases?`${S.releases} let go so far`:"";
+  if(lgStep===0){
+    bal.className="balloon";bal.style.transform="scale(.6)";note.hidden=true;ph.textContent="";
+    st.innerHTML=`<label class="f">What are you carrying today? A worry, a regret, or something you're angry at yourself about.<textarea id="lg-text" placeholder="e.g. I'm still annoyed at myself for wasting last week."></textarea></label><div><button class="btn primary" id="lg-next">Tie it to the balloon</button></div>`;
+    $("lg-next").onclick=()=>{const v=$("lg-text").value.trim();if(!v)return;lgText=v;lgStep=1;renderLet()};
+  }else if(lgStep===1){
+    note.hidden=false;note.textContent=lgText.length>90?lgText.slice(0,88)+"…":lgText;ph.textContent="Three slow breaths first";
+    st.innerHTML=`<p class="note" style="margin:0">Breathe in as the balloon grows, out as it shrinks. Three rounds, about 25 seconds.</p><div><button class="btn primary" id="lg-breathe">Start breathing</button></div>`;
+    $("lg-breathe").onclick=()=>{lgBusy=true;st.innerHTML="";let r=0,inhale=true;
+      const tick=()=>{if(r===3){lgBusy=false;lgStep=2;renderLet();return}
+        bal.style.transform=inhale?"scale(1)":"scale(.6)";ph.textContent=inhale?"Breathe in":"Breathe out";$("lg-count").textContent=`Breath ${r+1} of 3`;
+        if(!inhale)r++;inhale=!inhale;lgTimer=setTimeout(tick,4200)};tick()};
+  }else if(lgStep===2){
+    ph.textContent="Ready when you are";
+    st.innerHTML=`<label class="f">Write a release sentence, or pick one.<input type="text" id="lg-rel" placeholder="I'm putting this down for today."></label><div class="row chips" id="lg-sugg"></div><div><button class="btn primary" id="lg-go">Let it go</button></div>`;
+    chipRow($("lg-sugg"),["I did what I could with what I knew then.","I'm putting this down for today.","This doesn't get to define me.","I forgive myself and I'll keep learning."],t=>$("lg-rel").value=t);
+    $("lg-go").onclick=()=>{const rel=$("lg-rel").value.trim()||"I'm putting this down for today.";
+      lgText="";note.textContent=rel;bal.style.transform="";bal.classList.add("float");ph.textContent="It's gone.";lgStep=3;S.releases++;save();
+      st.innerHTML=`<p class="say" style="font-size:18px">“${esc(rel)}”</p><p class="note" style="margin:0">Notice how your body feels now. If the same thing comes back later, that's normal. You can let it go again.</p><div><button class="btn" id="lg-again">Let go of something else</button></div>`;
+      $("lg-again").onclick=()=>{lgStep=0;renderLet()}};
+  }
+}
+
+// ---------- wiring ----------
+document.getElementById("addform").onsubmit=e=>{
+  e.preventDefault();const n=document.getElementById("t-name");if(!n.value.trim())return;
+  if(S.examples){S.tasks=[];S.examples=false}
+  S.tasks.push({id:Date.now(),name:n.value.trim(),tag:document.getElementById("t-tag").value,dur:+document.getElementById("t-dur").value,ess:false,done:false});
+  n.value="";commit();
+};
+document.getElementById("wake").value=S.wake;document.getElementById("sleep").value=S.sleep;
+document.getElementById("wake").onchange=e=>{S.wake=e.target.value||"07:00";commit()};
+document.getElementById("sleep").onchange=e=>{S.sleep=Math.min(Math.max(+e.target.value||7,3),12);commit()};
+document.getElementById("lowtoggle").onchange=e=>{S.low=e.target.checked;S.lowDate=todayStr();commit()};
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));
+  ["today","check","reflect","games"].forEach(p=>document.getElementById("p-"+p).hidden=p!==t.dataset.p);
+  if(t.dataset.p==="games")showHub();
+  window.scrollTo(0,0);
+});
+document.getElementById("today-label").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});
+function commit(){save();render()}
+function render(){drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF();renderGames()}
+render();
+})();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>
