@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Plan your day around your energy, check in on your mood, and build confidence.">
+<meta name="theme-color" content="#2C6F68">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ebb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>ebb</title>
+<style>
+html{color-scheme:light}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font-size:14px;font-family:system-ui,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single centered column, app-style tab bar; tide-line energy chart as the signature element */
+:root{
+  --bg:#EDF1EF; --surface:#F8FAF9; --ink:#1C2A2B; --muted:#5E6E6C; --line:#D3DCD9;
+  --tide:#2C6F68; --tide-soft:#D6E8E4; --sun:#C98A1E; --sun-soft:#F5E6C8;
+  --deep:#2C6F68; --creative:#7A5AA6; --social:#B5603F; --shallow:#6B7C7A; --lift:#C98A1E;
+  --alert-bg:#FBEDE8; --alert-ink:#8A3A22;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121A1B; --surface:#1A2425; --ink:#E4ECEA; --muted:#97A7A4; --line:#2C3A3B;
+  --tide:#6CC0B5; --tide-soft:#20393A; --sun:#E8B65A; --sun-soft:#3A3020;
+  --deep:#6CC0B5; --creative:#B79BE0; --social:#E79A7A; --shallow:#9AAAA8; --lift:#E8B65A;
+  --alert-bg:#3A221B; --alert-ink:#F2B8A3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121A1B; --surface:#1A2425; --ink:#E4ECEA; --muted:#97A7A4; --line:#2C3A3B;
+  --tide:#6CC0B5; --tide-soft:#20393A; --sun:#E8B65A; --sun-soft:#3A3020;
+  --deep:#6CC0B5; --creative:#B79BE0; --social:#E79A7A; --shallow:#9AAAA8; --lift:#E8B65A;
+  --alert-bg:#3A221B; --alert-ink:#F2B8A3; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 96px}
+header.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:700 30px/1.1 var(--display);margin:0;letter-spacing:-.01em}
+h1 span{color:var(--tide)}
+h2{font:700 20px/1.2 var(--display);margin:0;text-wrap:balance}
+h3{font:600 15px/1.3 var(--body);margin:0}
+.date{font:500 13px var(--mono);color:var(--muted)}
+.lede{color:var(--muted);margin:4px 0 0;max-width:60ch}
+section.panel{display:grid;gap:18px;margin-top:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;min-width:0}
+.eyebrow{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--tide)}
+.btn.primary{background:var(--tide);border-color:var(--tide);color:var(--surface)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.tab:focus-visible,.scale button:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+input[type=text],input[type=number],input[type=time],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+textarea{width:100%;resize:vertical;min-height:72px}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+/* tabs */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:8px max(12px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-right,0px));z-index:5}
+.tab{border:0;background:none;padding:8px 14px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:600;font-size:14px;display:grid;justify-items:center;gap:2px}
+.tab small{font:400 10px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.tab[aria-selected="true"]{color:var(--tide);background:var(--tide-soft)}
+/* chart */
+.chart-box{overflow-x:auto}
+svg.curve{width:100%;min-width:480px;height:auto;display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* tasks */
+.chip{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.t-deep{color:var(--deep)} .t-creative{color:var(--creative)} .t-social{color:var(--social)} .t-shallow{color:var(--shallow)} .t-lift{color:var(--lift)}
+ul.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.task{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.task .name{min-width:0;overflow-wrap:anywhere}
+.task.done .name{text-decoration:line-through;color:var(--muted)}
+.icon-btn{border:0;background:none;cursor:pointer;color:var(--muted);padding:4px 6px;border-radius:6px;font-size:16px;line-height:1}
+.icon-btn:hover{color:var(--ink);background:var(--tide-soft)}
+.star{color:var(--sun)}
+.addform{display:grid;grid-template-columns:1fr 130px 90px auto;gap:8px}
+@media (max-width:560px){.addform{grid-template-columns:1fr 1fr}.addform input[type=text]{grid-column:1/-1}}
+.plan{display:grid;gap:6px}
+.slot{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;padding:8px 0;border-bottom:1px dashed var(--line)}
+.slot:last-child{border-bottom:0}
+.slot time{font:500 13px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.slot .what{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-width:0}
+.fit{font-size:12px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+.example{font:500 11px var(--mono);background:var(--sun-soft);color:var(--ink);padding:2px 8px;border-radius:6px}
+.banner{background:var(--sun-soft);border-radius:12px;padding:12px 14px;display:grid;gap:6px}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:600}
+.toggle input{width:18px;height:18px;accent-color:var(--tide)}
+/* check-in */
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 4px;cursor:pointer;display:grid;gap:2px;justify-items:center;font-size:12px;color:var(--muted)}
+.scale button b{font:700 18px var(--display);color:var(--ink)}
+.scale button[aria-pressed="true"]{border-color:var(--tide);background:var(--tide-soft);color:var(--ink)}
+.hist{display:grid;gap:6px}
+.hrow{display:grid;grid-template-columns:120px 1fr 1fr;gap:10px;align-items:center;font-size:13px}
+.hrow time{font:400 12px var(--mono);color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;border-radius:4px}
+.support{background:var(--alert-bg);color:var(--alert-ink);border-radius:12px;padding:14px;display:grid;gap:6px}
+.support strong{font-size:16px}
+.num{font:600 15px var(--mono);user-select:all}
+/* reflect */
+.prompt{font:500 21px/1.35 var(--display);text-wrap:balance;margin:0}
+.proof{padding:10px 12px;border-left:3px solid var(--sun);background:var(--bg);border-radius:0 10px 10px 0}
+.proof time{font:400 11px var(--mono);color:var(--muted);display:block}
+.weekq{display:grid;gap:14px}
+.wk{display:flex;gap:6px;align-items:flex-end;height:70px}
+.wk div{flex:1;background:var(--tide);border-radius:4px 4px 0 0;min-height:4px;position:relative}
+.wk-labels{display:flex;gap:6px;font:400 10px var(--mono);color:var(--muted)}
+.wk-labels span{flex:1;text-align:center}
+/* thought flip */
+.flipwrap{perspective:1000px}
+.flipcard{position:relative;min-height:170px;transition:transform .6s;transform-style:preserve-3d}
+.flipcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:20px;display:grid;align-content:center;gap:8px}
+.face.front{background:var(--ink);color:var(--bg)}
+.face.back{background:var(--tide-soft);color:var(--ink);transform:rotateY(180deg)}
+.face .q{font:600 20px/1.35 var(--display)}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;cursor:pointer}
+.opt:hover{border-color:var(--tide)}
+.opt.nope{opacity:.5;text-decoration:line-through}
+.feedback{font-size:14px;min-height:1.4em;color:var(--muted)}
+/* balloon */
+.sky{position:relative;height:300px;border-radius:14px;background:linear-gradient(var(--tide-soft),var(--bg));overflow:hidden;display:grid;place-items:center}
+.balloon{width:120px;height:140px;border-radius:50% 50% 48% 48%;background:var(--sun);transform:scale(.55);transition:transform 4s ease-in-out;position:relative;box-shadow:inset -14px -12px 0 rgba(0,0,0,.08)}
+.balloon::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:80px;background:var(--muted)}
+.balloon.float{transition:transform 3s ease-in;transform:translateY(-420px) scale(.8)}
+.phase{position:absolute;bottom:14px;left:0;right:0;text-align:center;font:600 18px var(--display)}
+.count{position:absolute;top:12px;right:14px;font:500 13px var(--mono);color:var(--muted)}
+footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.flipcard,.balloon,.balloon.float{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>ebb<span>.</span></h1>
+      <p class="lede">Plan your day around your energy. Be kind to yourself on the low ones.</p>
+    </div>
+    <div class="date" id="today-label"></div>
+  </header>
+
+  <!-- TODAY -->
+  <section class="panel" id="p-today">
+    <div class="banner" id="lowbat" hidden>
+      <h3>Low battery mode is on</h3>
+      <p class="note" style="margin:0">Today's plan is trimmed to your essentials and one small lift. Doing less on a hard day still counts.</p>
+      <div id="lowbat-proof"></div>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div>
+          <div class="eyebrow">Today's energy forecast</div>
+          <h2 id="forecast-head">Your peaks and dips</h2>
+        </div>
+        <div class="row">
+          <label class="f">Woke at<input type="time" id="wake" value="07:00"></label>
+          <label class="f">Slept (hrs)<input type="number" id="sleep" min="3" max="12" step="0.5" value="7" style="width:80px"></label>
+        </div>
+      </div>
+      <div class="chart-box"><svg class="curve" id="curve" viewBox="0 0 640 200" role="img" aria-label="Predicted energy across the day"></svg></div>
+      <div class="legend"><span><i style="background:var(--tide)"></i>Predicted energy</span><span><i style="background:var(--sun)"></i>Your check-ins</span><span><i style="background:var(--tide-soft)"></i>Peak windows</span></div>
+      <p class="note" style="margin:0" id="forecast-note"></p>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div><div class="eyebrow">Tasks</div><h2>What's on your plate</h2></div>
+        <span class="example" id="example-tag">Example tasks: replace with yours</span>
+      </div>
+      <form class="addform" id="addform">
+        <input type="text" id="t-name" placeholder="Add a task, e.g. Write intro paragraph" aria-label="Task name" required>
+        <select id="t-tag" aria-label="Task type">
+          <option value="deep">Deep work</option>
+          <option value="creative">Creative</option>
+          <option value="social">Social / meeting</option>
+          <option value="shallow">Shallow / admin</option>
+          <option value="lift">Lift (mood boost)</option>
+        </select>
+        <select id="t-dur" aria-label="Duration">
+          <option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option><option value="60">1 hr</option><option value="90">1.5 hr</option><option value="120">2 hr</option>
+        </select>
+        <button class="btn primary" type="submit">Add</button>
+      </form>
+      <ul class="list" id="tasklist"></ul>
+      <p class="note" style="margin:0">★ marks an essential. On low-energy days, only essentials stay on the plan.</p>
+    </div>
+
+    <div class="card">
+      <div class="spread">
+        <div><div class="eyebrow">Your plan</div><h2>Matched to your energy</h2></div>
+        <label class="toggle"><input type="checkbox" id="lowtoggle">Low battery mode</label>
+      </div>
+      <div class="plan" id="plan"></div>
+    </div>
+  </section>
+
+  <!-- CHECK-IN -->
+  <section class="panel" id="p-check" hidden>
+    <div class="card">
+      <div class="eyebrow">Check-in · takes 10 seconds</div>
+      <h2>How are you right now?</h2>
+      <div>
+        <h3 style="margin-bottom:6px">Energy</h3>
+        <div class="scale" id="sc-energy" role="group" aria-label="Energy level"></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:6px">Mood</h3>
+        <div class="scale" id="sc-mood" role="group" aria-label="Mood"></div>
+      </div>
+      <label class="f">Anything on your mind? (optional, stays on this device)
+        <textarea id="ci-note" placeholder="e.g. Slept badly, meeting went well..."></textarea>
+      </label>
+      <div class="row"><button class="btn primary" id="ci-save">Save check-in</button><span class="note" id="ci-msg" role="status"></span></div>
+    </div>
+    <div class="support" id="support" hidden>
+      <strong>You don't have to carry this alone.</strong>
+      <span>If things feel very heavy, please talk to someone now. In India, Tele-MANAS is free and open 24/7: <span class="num">14416</span> or <span class="num">1-800-891-4416</span>. If you are in danger, call <span class="num">112</span>.</span>
+      <span>Outside India, your local emergency number or a nearby crisis line can help.</span>
+    </div>
+    <div class="card">
+      <div class="spread"><div><div class="eyebrow">Recent check-ins</div><h2>Your pattern</h2></div></div>
+      <div class="hist" id="hist"></div>
+      <p class="note" id="pattern" style="margin:0"></p>
+    </div>
+  </section>
+
+  <!-- REFLECT -->
+  <section class="panel" id="p-reflect" hidden>
+    <div class="card">
+      <div class="eyebrow">Today's confidence prompt</div>
+      <p class="prompt" id="prompt"></p>
+      <textarea id="pr-answer" placeholder="Something small counts. A real example beats a big claim."></textarea>
+      <div class="row"><button class="btn primary" id="pr-save">Add to proof of me</button><button class="btn" id="pr-skip">Different prompt</button><span class="note" id="pr-msg" role="status"></span></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Weekly · 1 = not really, 5 = very true</div>
+      <h2>This week</h2>
+      <div class="weekq" id="weekq"></div>
+      <div class="row"><button class="btn primary" id="wk-save">Save this week</button><span class="note" id="wk-msg" role="status"></span></div>
+      <div id="wk-chart-wrap" hidden>
+        <div class="eyebrow" style="margin-bottom:6px">Your weekly average</div>
+        <div class="wk" id="wk-chart"></div>
+        <div class="wk-labels" id="wk-labels"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Proof of me</div>
+      <h2>Things you did</h2>
+      <ul class="list" id="proofs"></ul>
+    </div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="panel" id="p-games" hidden>
+    <div class="card">
+      <div class="spread"><div><div class="eyebrow">Game · Thought Flip</div><h2>Find the balanced thought</h2></div><span class="note" id="tf-count"></span></div>
+      <div class="flipwrap"><div class="flipcard" id="tf-card">
+        <div class="face front"><span class="eyebrow" style="color:inherit;opacity:.7" id="tf-trap"></span><div class="q" id="tf-thought"></div></div>
+        <div class="face back"><span class="eyebrow">Flipped</span><div class="q" id="tf-balanced"></div></div>
+      </div></div>
+      <div class="opts" id="tf-opts"></div>
+      <div class="feedback" id="tf-feedback" role="status"></div>
+      <div><button class="btn" id="tf-next" hidden>Next card</button></div>
+    </div>
+    <div class="card">
+      <div class="spread"><div><div class="eyebrow">Game · Breathing Balloon</div><h2>Box breathing, 4 seconds a side</h2></div>
+        <div class="row"><select id="br-rounds" aria-label="Rounds"><option value="3">3 rounds</option><option value="5" selected>5 rounds</option><option value="8">8 rounds</option></select><button class="btn primary" id="br-start">Start</button></div></div>
+      <div class="sky"><div class="count" id="br-count"></div><div class="balloon" id="balloon"></div><div class="phase" id="br-phase">Press start when ready</div></div>
+    </div>
+  </section>
+
+  <footer class="help">Your data stays in this browser only. ebb is a self-help tool, not a treatment. If you feel low for more than two weeks, a doctor or counsellor can help. Tele-MANAS (India, 24/7): <span class="num">14416</span></footer>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="today">Today<small>plan</small></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="check">Check-in<small>how now</small></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="reflect">Reflect<small>proof</small></button>
+  <button class="tab" role="tab" aria-selected="false" data-p="games">Games<small>reset</small></button>
+</nav>
+
+<script>
+(function(){
+const KEY="ebb-v1";
+const todayStr=()=>new Date().toISOString().slice(0,10);
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let S=load()||{
+  examples:true,
+  tasks:[
+    {id:1,name:"Draft methods section",tag:"deep",dur:90,ess:true,done:false},
+    {id:2,name:"Review two papers",tag:"deep",dur:60,ess:false,done:false},
+    {id:3,name:"Sketch figure ideas",tag:"creative",dur:45,ess:false,done:false},
+    {id:4,name:"Lab meeting",tag:"social",dur:60,ess:true,done:false},
+    {id:5,name:"Reply to emails",tag:"shallow",dur:30,ess:true,done:false},
+    {id:6,name:"Walk outside in daylight",tag:"lift",dur:20,ess:false,done:false}
+  ],
+  wake:"07:00",sleep:7,checkins:[],proofs:[],weeks:{},low:null,promptOffset:0,tfIndex:0
+};
+const TAGS={deep:"Deep",creative:"Creative",social:"Social",shallow:"Shallow",lift:"Lift"};
+
+// ---------- energy model ----------
+const g=(x,m,s)=>Math.exp(-((x-m)**2)/(2*s*s));
+const wakeH=()=>{const[a,b]=S.wake.split(":").map(Number);return a+b/60};
+function baseEnergy(h){ // h = hours since waking
+  let e=0.32+0.55*g(h,3.5,2.2)+0.42*g(h,10.5,2.0)-0.16*g(h,7.5,1.2)-0.3*Math.min(Math.max((h-13)/4,0),1)-0.22*Math.exp(-h/0.8);
+  const sf=Math.min(Math.max((S.sleep-4)/3.5,0.45),1.05);
+  e=0.12+(e-0.12)*sf;
+  return Math.min(Math.max(e,0.05),1);
+}
+function todaysCheckins(){const t=todayStr();return S.checkins.filter(c=>c.date===t)}
+function energyAt(clock){ // clock hours (e.g. 14.5)
+  const h=clock-wakeH(); let e=baseEnergy(h);
+  const cs=todaysCheckins();
+  if(cs.length){const c=cs[cs.length-1];const obs=(c.energy-1)/4;const delta=obs-baseEnergy(c.clock-wakeH());e+=delta*Math.exp(-Math.abs(clock-c.clock)/3);}
+  return Math.min(Math.max(e,0.03),1);
+}
+const fmt=h=>{h=((h%24)+24)%24;const H=Math.floor(h),M=Math.round((h-H)*60);const hh=(M===60?H+1:H)%24,mm=M===60?0:M;const ap=hh>=12?"pm":"am";return `${(hh%12)||12}:${String(mm).padStart(2,"0")} ${ap}`};
+const nowClock=()=>{const d=new Date();return d.getHours()+d.getMinutes()/60};
+
+// ---------- chart ----------
+function drawCurve(){
+  const svg=document.getElementById("curve");
+  const W=640,H=200,L=34,R=12,T=14,B=30,w0=wakeH(),span=17;
+  const x=c=>L+(c-w0)/span*(W-L-R), y=e=>T+(1-e)*(H-T-B);
+  let pts=[],peaks=[];
+  for(let i=0;i<=span*4;i++){const c=w0+i/4,e=energyAt(c);pts.push([x(c),y(e)]);}
+  let path="M"+pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" L");
+  let area=path+` L${x(w0+span)},${y(0)} L${x(w0)},${y(0)} Z`;
+  // peak windows: e >= 0.7 of max
+  let mx=0;for(let i=0;i<=span*4;i++)mx=Math.max(mx,energyAt(w0+i/4));
+  let inP=false,st=0;for(let i=0;i<=span*4;i++){const c=w0+i/4,hi=energyAt(c)>=mx*0.82;if(hi&&!inP){inP=true;st=c}if((!hi||i===span*4)&&inP){inP=false;peaks.push([st,c])}}
+  let s="";
+  peaks.forEach(p=>{s+=`<rect x="${x(p[0])}" y="${T}" width="${x(p[1])-x(p[0])}" height="${H-T-B}" fill="var(--tide-soft)"/>`});
+  [0,.5,1].forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-dasharray="3 4"/>`});
+  s+=`<text x="${L-6}" y="${y(1)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">High</text>`;
+  s+=`<text x="${L-6}" y="${y(0)+4}" text-anchor="end" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">Low</text>`;
+  for(let k=0;k<=span;k+=2){const c=w0+k;s+=`<text x="${x(c)}" y="${H-10}" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="JetBrains Mono,monospace">${fmt(c).replace(":00","")}</text>`}
+  s+=`<path d="${area}" fill="var(--tide)" opacity=".10"/><path d="${path}" fill="none" stroke="var(--tide)" stroke-width="2.5" stroke-linejoin="round"/>`;
+  const n=nowClock();
+  if(n>=w0&&n<=w0+span){s+=`<line x1="${x(n)}" x2="${x(n)}" y1="${T}" y2="${H-B}" stroke="var(--ink)" stroke-width="1"/><circle cx="${x(n)}" cy="${y(energyAt(n))}" r="5" fill="var(--ink)"/><text x="${x(n)+6}" y="${T+10}" font-size="10" fill="var(--ink)" font-family="JetBrains Mono,monospace">now</text>`}
+  todaysCheckins().forEach(c=>{if(c.clock>=w0&&c.clock<=w0+span)s+=`<circle cx="${x(c.clock)}" cy="${y((c.energy-1)/4)}" r="5" fill="var(--sun)" stroke="var(--surface)" stroke-width="2"/>`});
+  svg.innerHTML=s;
+  const pk=peaks.map(p=>`${fmt(p[0])}–${fmt(p[1])}`).join(" and ");
+  document.getElementById("forecast-note").textContent=(peaks.length?`Best focus windows: ${pk}. `:"")+`Expect a dip around ${fmt(w0+7.5)}.`+(todaysCheckins().length?" Adjusted with your latest check-in.":" Check in to make this more accurate.");
+}
+
+// ---------- tasks ----------
+function renderTasks(){
+  const ul=document.getElementById("tasklist");ul.innerHTML="";
+  document.getElementById("example-tag").hidden=!S.examples;
+  if(!S.tasks.length){ul.innerHTML='<li class="note">No tasks yet. Add one above.</li>'}
+  S.tasks.forEach(t=>{
+    const li=document.createElement("li");li.className="task"+(t.done?" done":"");
+    li.innerHTML=`<input type="checkbox" ${t.done?"checked":""} aria-label="Done" id="d${t.id}"><span class="name">${esc(t.name)} <span class="fit">· ${t.dur} min</span></span><span class="chip t-${t.tag}">${TAGS[t.tag]}</span><span class="row" style="gap:0"><button class="icon-btn ${t.ess?"star":""}" title="Mark essential" aria-label="Toggle essential">${t.ess?"★":"☆"}</button><button class="icon-btn" title="Remove" aria-label="Remove task">×</button></span>`;
+    const [cb]=li.querySelectorAll("input");const [st,rm]=li.querySelectorAll("button");
+    cb.onchange=()=>{t.done=cb.checked;commit()};
+    st.onclick=()=>{t.ess=!t.ess;commit()};
+    rm.onclick=()=>{S.tasks=S.tasks.filter(x=>x!==t);commit()};
+    ul.appendChild(li);
+  });
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+// ---------- scheduler ----------
+function isLow(){
+  if(S.low!==null&&S.lowDate===todayStr())return S.low;
+  const cs=todaysCheckins();if(!cs.length)return false;const c=cs[cs.length-1];return c.energy<=2||c.mood<=2;
+}
+function plan(){
+  const w0=wakeH(),start=Math.max(w0+1,Math.ceil(nowClock()*2)/2),end=w0+15.5;
+  const slots=[];for(let c=start;c<end;c+=0.5)slots.push({c,e:energyAt(c+0.25),used:false});
+  let tasks=S.tasks.filter(t=>!t.done);
+  const low=isLow();
+  if(low){const ess=tasks.filter(t=>t.ess).slice(0,3);const lift=tasks.find(t=>t.tag==="lift")||{id:-1,name:"10-minute walk or stretch",tag:"lift",dur:15};tasks=[...ess,lift]}
+  const order={deep:0,creative:1,social:2,shallow:3,lift:4};
+  tasks=[...tasks].sort((a,b)=>(b.ess-a.ess)||(order[a.tag]-order[b.tag]));
+  const out=[],left=[];
+  tasks.forEach(t=>{
+    const n=Math.ceil(t.dur/30);let best=-1,score=-1e9;
+    for(let i=0;i+n<=slots.length;i++){
+      let ok=true,avg=0;for(let k=0;k<n;k++){if(slots[i+k].used){ok=false;break}avg+=slots[i+k].e}
+      if(!ok)continue;avg/=n;
+      let sc= t.tag==="deep"?avg: t.tag==="creative"?avg-0.15*Math.abs(avg-0.7): t.tag==="social"?-Math.abs(avg-0.6): t.tag==="shallow"?-avg: -avg-0.1*Math.abs(slots[i].c-(w0+7.5));
+      sc-=i*0.002; // gentle preference for earlier
+      if(sc>score){score=sc;best=i}
+    }
+    if(best<0){left.push(t);return}
+    for(let k=0;k<n;k++)slots[best+k].used=true;
+    out.push({t,c:slots[best].c,e:slots[best].e});
+  });
+  out.sort((a,b)=>a.c-b.c);
+  return {out,left,low};
+}
+function fitText(t,e){
+  const lvl=e>0.7?"high":e>0.45?"medium":"low";
+  const why={deep:"needs your sharpest focus",creative:"good with some energy to play",social:"people time fits mid energy",shallow:"low-effort work fits a dip",lift:"a lift where energy sags"};
+  return `${lvl} energy · ${why[t.tag]}`;
+}
+function renderPlan(){
+  const {out,left,low}=plan();const el=document.getElementById("plan");
+  document.getElementById("lowtoggle").checked=low;
+  const lb=document.getElementById("lowbat");lb.hidden=!low;
+  if(low&&S.proofs.length){const p=S.proofs[Math.floor(Math.random()*S.proofs.length)];document.getElementById("lowbat-proof").innerHTML=`<div class="proof"><time>${p.date} · a reminder from you</time>${esc(p.text)}</div>`}else document.getElementById("lowbat-proof").innerHTML="";
+  if(!out.length){el.innerHTML=`<p class="note">${S.tasks.filter(t=>!t.done).length?"No time left today for these. Tomorrow is fine.":"All done or nothing planned. Enjoy the rest of your day."}</p>`;return}
+  el.innerHTML=out.map(o=>`<div class="slot"><time>${fmt(o.c)}</time><div><div class="what"><strong>${esc(o.t.name)}</strong><span class="chip t-${o.t.tag}">${TAGS[o.t.tag]}</span></div><div class="fit">${o.t.dur} min · ${fitText(o.t,o.e)}</div></div></div>`).join("")+(left.length?`<p class="note">Didn't fit today: ${left.map(t=>esc(t.name)).join(", ")}. Moving them to tomorrow is a plan, not a failure.</p>`:"");
+}
+
+// ---------- check-in ----------
+let ciE=0,ciM=0;
+function buildScale(id,labels,set){
+  const el=document.getElementById(id);el.innerHTML="";
+  labels.forEach((lab,i)=>{const b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed","false");b.innerHTML=`<b>${i+1}</b>${lab}`;b.onclick=()=>{[...el.children].forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");set(i+1)};el.appendChild(b)});
+}
+buildScale("sc-energy",["Drained","Low","Okay","Good","Charged"],v=>ciE=v);
+buildScale("sc-mood",["Very low","Low","Neutral","Good","Great"],v=>ciM=v);
+const CRISIS=/(suicid|kill myself|end it all|end my life|want to die|self.?harm|hurt myself|no reason to live|better off without me|can'?t go on)/i;
+document.getElementById("ci-save").onclick=()=>{
+  const msg=document.getElementById("ci-msg");
+  if(!ciE||!ciM){msg.textContent="Pick a number for energy and mood.";return}
+  const note=document.getElementById("ci-note").value.trim();
+  S.checkins.push({date:todayStr(),clock:nowClock(),energy:ciE,mood:ciM,note});
+  S.low=null;
+  const recentLow=S.checkins.slice(-3).length===3&&S.checkins.slice(-3).every(c=>c.mood===1);
+  document.getElementById("support").hidden=!(CRISIS.test(note)||recentLow);
+  msg.textContent=ciE<=2||ciM<=2?"Saved. Today's plan is now lighter.":"Saved. Your forecast is updated.";
+  document.getElementById("ci-note").value="";ciE=ciM=0;
+  document.querySelectorAll(".scale button").forEach(b=>b.setAttribute("aria-pressed","false"));
+  commit();
+};
+function renderHist(){
+  const el=document.getElementById("hist");const cs=S.checkins.slice(-10).reverse();
+  if(!cs.length){el.innerHTML='<p class="note">Your check-ins will show here. Try three a day for a week: morning, after lunch, evening.</p>';document.getElementById("pattern").textContent="";return}
+  el.innerHTML='<div class="hrow eyebrow"><span>When</span><span>Energy</span><span>Mood</span></div>'+cs.map(c=>`<div class="hrow"><time>${c.date.slice(5)} ${fmt(c.clock)}</time><div class="bar"><span style="width:${c.energy*20}%;background:var(--tide)"></span></div><div class="bar"><span style="width:${c.mood*20}%;background:var(--sun)"></span></div></div>`).join("");
+  const all=S.checkins;
+  if(all.length>=5){const am=all.filter(c=>c.clock<12),pm=all.filter(c=>c.clock>=12);const avg=a=>a.reduce((s,c)=>s+c.mood,0)/a.length;
+    let t=`Average mood ${avg(all).toFixed(1)} of 5 across ${all.length} check-ins.`;
+    if(am.length&&pm.length){const d=avg(am)-avg(pm);if(Math.abs(d)>=0.5)t+=` Your mood tends to be ${d>0?"better in the morning":"better after noon"}.`}
+    document.getElementById("pattern").textContent=t}
+  else document.getElementById("pattern").textContent=`${5-all.length} more check-in${5-all.length>1?"s":""} until you see patterns.`;
+}
+
+// ---------- reflect ----------
+const PROMPTS=["What's one thing you handled today, even if it was small?","When did you help someone or make their day a bit easier?","What did you do today that past-you would have found hard?","What's one thing you're a little better at than a month ago?","What problem did you work through, even partly?","When did you keep going even though you didn't feel like it?","What's one kind thing you did for yourself today?","Who would say thank you to you for something this week, and for what?","What did you learn today, however small?","What's something you finished, started, or tidied up?"];
+function dayIdx(){return Math.floor(Date.now()/864e5)}
+function renderPrompt(){document.getElementById("prompt").textContent=PROMPTS[(dayIdx()+S.promptOffset)%PROMPTS.length]}
+document.getElementById("pr-skip").onclick=()=>{S.promptOffset++;commit()};
+document.getElementById("pr-save").onclick=()=>{
+  const a=document.getElementById("pr-answer"),v=a.value.trim(),m=document.getElementById("pr-msg");
+  if(!v){m.textContent="Write one small thing first.";return}
+  S.proofs.unshift({date:todayStr(),q:document.getElementById("prompt").textContent,text:v});a.value="";m.textContent="Saved. That's real evidence.";commit();
+};
+function renderProofs(){
+  const ul=document.getElementById("proofs");
+  ul.innerHTML=S.proofs.length?S.proofs.slice(0,30).map(p=>`<li class="proof"><time>${p.date}</time>${esc(p.text)}</li>`).join(""):'<li class="note">Your answers collect here. On low days, ebb shows you one of them as a reminder.</li>';
+}
+const WQ=["I kept going this week even when things were hard.","I did at least one thing I'm glad I did.","I was kind to someone, including myself."];
+function weekKey(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d.toISOString().slice(0,10)}
+const wkVals=[0,0,0];
+function renderWeek(){
+  const el=document.getElementById("weekq");el.innerHTML="";
+  const cur=S.weeks[weekKey()];
+  WQ.forEach((q,i)=>{const d=document.createElement("div");d.innerHTML=`<h3 style="margin-bottom:6px">${q}</h3><div class="scale" id="wq${i}"></div>`;el.appendChild(d);
+    buildScale("wq"+i,["","","","",""],v=>wkVals[i]=v);
+    if(cur){wkVals[i]=cur[i];document.getElementById("wq"+i).children[cur[i]-1].setAttribute("aria-pressed","true")}});
+  const keys=Object.keys(S.weeks).sort().slice(-8);
+  const wrap=document.getElementById("wk-chart-wrap");wrap.hidden=!keys.length;
+  document.getElementById("wk-chart").innerHTML=keys.map(k=>{const v=S.weeks[k],a=(v[0]+v[1]+v[2])/3;return `<div style="height:${a/5*100}%" title="${a.toFixed(1)}"></div>`}).join("");
+  document.getElementById("wk-labels").innerHTML=keys.map(k=>`<span>${k.slice(5)}</span>`).join("");
+}
+document.getElementById("wk-save").onclick=()=>{
+  const m=document.getElementById("wk-msg");if(wkVals.some(v=>!v)){m.textContent="Answer all three.";return}
+  S.weeks[weekKey()]=[...wkVals];m.textContent="Saved for this week.";commit();
+};
+
+// ---------- thought flip ----------
+const CARDS=[
+ {trap:"All-or-nothing",t:"I didn't finish everything, so today was a waste.",opts:["Today was a complete failure.","I got some things done, and the rest can move to tomorrow.","I should never plan anything."],a:1},
+ {trap:"Mind reading",t:"My supervisor thinks I'm not good enough.",opts:["I don't know what they think. I could ask for specific feedback.","Everyone thinks I'm not good enough.","I must avoid them from now on."],a:0},
+ {trap:"Catastrophizing",t:"If this experiment fails, my whole career is over.",opts:["Failing would prove I'm useless.","I'd better not run it at all.","Failed experiments are normal. I'd learn something and try another way."],a:2},
+ {trap:"Labeling",t:"I made a mistake. I'm such an idiot.",opts:["I made a mistake, like everyone does. I can fix it or learn from it.","I'm an idiot and always will be.","Mistakes mean I shouldn't try new things."],a:0},
+ {trap:"Overgeneralizing",t:"Nothing ever goes right for me.",opts:["Everything always goes wrong.","Some things went wrong today, and some things have gone right before.","There's no point trying."],a:1},
+ {trap:"Should statements",t:"I should be as productive as everyone else.",opts:["I'm lazy compared to everyone.","I should work twice as hard tonight.","People work at different paces. I can focus on my own progress."],a:2},
+ {trap:"Discounting the positive",t:"They only praised my work to be nice.",opts:["They might actually mean it. I can take the compliment.","Praise never means anything.","I should stop sharing my work."],a:0},
+ {trap:"Emotional reasoning",t:"I feel anxious, so something bad must be about to happen.",opts:["Feelings are always right.","Anxiety is a feeling, not a forecast. I can notice it and keep going.","I should cancel everything today."],a:1}
+];
+function renderTF(){
+  const c=CARDS[S.tfIndex%CARDS.length];
+  document.getElementById("tf-card").classList.remove("flipped");
+  document.getElementById("tf-trap").textContent="Thinking trap: "+c.trap;
+  document.getElementById("tf-thought").textContent="“"+c.t+"”";
+  document.getElementById("tf-balanced").textContent=c.opts[c.a];
+  document.getElementById("tf-count").textContent=`Card ${S.tfIndex%CARDS.length+1} of ${CARDS.length}`;
+  document.getElementById("tf-feedback").textContent="Tap the more balanced way to see it.";
+  document.getElementById("tf-next").hidden=true;
+  const o=document.getElementById("tf-opts");o.innerHTML="";
+  c.opts.forEach((txt,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=txt;b.onclick=()=>{
+    if(i===c.a){document.getElementById("tf-card").classList.add("flipped");document.getElementById("tf-feedback").textContent="That's the flip. Balanced thoughts are true and kind at the same time.";document.getElementById("tf-next").hidden=false;o.querySelectorAll("button").forEach(x=>x.disabled=true)}
+    else{b.classList.add("nope");document.getElementById("tf-feedback").textContent="That one still carries the trap. Try another."}
+  };o.appendChild(b)});
+}
+document.getElementById("tf-next").onclick=()=>{S.tfIndex++;commit()};
+
+// ---------- breathing balloon ----------
+let brTimer=null;
+document.getElementById("br-start").onclick=()=>{
+  const bal=document.getElementById("balloon"),ph=document.getElementById("br-phase"),ct=document.getElementById("br-count"),btn=document.getElementById("br-start");
+  if(brTimer){clearTimeout(brTimer);brTimer=null;bal.className="balloon";bal.style.transform="";ph.textContent="Stopped. Start again anytime.";ct.textContent="";btn.textContent="Start";return}
+  const rounds=+document.getElementById("br-rounds").value;btn.textContent="Stop";
+  const phases=[["Breathe in",1],["Hold",1],["Breathe out",.55],["Hold",.55]];
+  let r=0,p=0,sec=4;bal.className="balloon";
+  function tick(){
+    if(sec===4){const [name,sc]=phases[p];bal.style.transform=`scale(${sc})`;ph.textContent=name}
+    ct.textContent=`Round ${r+1} of ${rounds} · ${sec}`;
+    sec--;
+    if(sec===0){sec=4;p++;if(p===4){p=0;r++;if(r===rounds){brTimer=setTimeout(()=>{bal.style.transform="";bal.classList.add("float");ph.textContent="Nicely done. Notice how you feel.";ct.textContent="";btn.textContent="Start";brTimer=null},1000);return}}}
+    brTimer=setTimeout(tick,1000);
+  }
+  tick();
+};
+
+// ---------- wiring ----------
+document.getElementById("addform").onsubmit=e=>{
+  e.preventDefault();const n=document.getElementById("t-name");if(!n.value.trim())return;
+  if(S.examples){S.tasks=[];S.examples=false}
+  S.tasks.push({id:Date.now(),name:n.value.trim(),tag:document.getElementById("t-tag").value,dur:+document.getElementById("t-dur").value,ess:false,done:false});
+  n.value="";commit();
+};
+document.getElementById("wake").value=S.wake;document.getElementById("sleep").value=S.sleep;
+document.getElementById("wake").onchange=e=>{S.wake=e.target.value||"07:00";commit()};
+document.getElementById("sleep").onchange=e=>{S.sleep=Math.min(Math.max(+e.target.value||7,3),12);commit()};
+document.getElementById("lowtoggle").onchange=e=>{S.low=e.target.checked;S.lowDate=todayStr();commit()};
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));
+  ["today","check","reflect","games"].forEach(p=>document.getElementById("p-"+p).hidden=p!==t.dataset.p);
+  window.scrollTo(0,0);
+});
+document.getElementById("today-label").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"short"});
+function commit(){save();render()}
+function render(){drawCurve();renderTasks();renderPlan();renderHist();renderPrompt();renderProofs();renderWeek();renderTF()}
+render();
+})();
+</script>
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+</script>
+</body>
+</html>
