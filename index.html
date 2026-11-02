@@ -131,10 +131,13 @@ ul.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .wk-labels span{flex:1;text-align:center}
 /* thought flip */
 .flipwrap{perspective:1000px}
-.flipcard{position:relative;min-height:170px;transition:transform .6s;transform-style:preserve-3d}
+.flipcard{position:relative;display:grid;min-height:170px;transition:transform .6s;transform-style:preserve-3d}
 .flipcard.flipped{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;padding:20px;display:grid;align-content:center;gap:8px}
+.face{grid-area:1/1;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:14px;padding:20px;display:grid;align-content:center;gap:8px}
 .face.front{background:var(--ink);color:var(--bg)}
+.face.front.sunny{background:var(--sun-soft);color:var(--ink);border:2px solid var(--sun)}
+.face.back.sunny{background:var(--sun);color:var(--ink)}
+.face .q{overflow-wrap:anywhere}
 .face.back{background:var(--tide-soft);color:var(--ink);transform:rotateY(180deg)}
 .face .q{font:600 20px/1.35 var(--display)}
 .opts{display:grid;gap:8px}
@@ -173,27 +176,6 @@ svg.reef{width:100%;height:auto;display:block;border-radius:12px}
 .dots i{width:9px;height:9px;border-radius:3px;background:var(--line)}
 .dots i.on{background:var(--coral-d)}
 .stackform{display:grid;gap:10px}
-.jars{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.jar{display:grid;justify-items:center;gap:4px;text-align:center;padding:12px;border-radius:12px;background:var(--bg);position:relative}
-.jar svg{width:110px;height:auto}
-.jar .lvl{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--tide)}
-.jar .icon-btn{position:absolute;top:4px;right:4px}
-@keyframes drop{from{transform:translateY(-90px);opacity:0}to{transform:none;opacity:1}}
-.tok-new{animation:drop .7s cubic-bezier(.3,1.4,.6,1)}
-.room{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:8px;border:3px solid var(--ink);border-radius:4px;background:var(--bg)}
-.zone{min-height:118px;border:1px dashed var(--muted);border-radius:3px;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;align-items:flex-start;background:var(--surface);min-width:0}
-.zone.target{border:1px solid var(--sun);background:var(--sun-soft)}
-.zone .zl{font:500 10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.item{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 9px;font-size:13px;cursor:pointer;text-align:left;max-width:100%}
-.item[aria-pressed="true"]{border-color:var(--sun);box-shadow:0 0 0 2px var(--sun)}
-.meters{display:grid;gap:10px}
-.meter{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px}
-.meter .bar{grid-column:1/-1;height:10px}
-.meter .bar span{transition:width .4s}
-.meter b{font:500 13px var(--mono);font-variant-numeric:tabular-nums}
-.checklist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.checklist label{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
-.checklist input{margin-top:4px;accent-color:var(--tide)}
 .casefile{background:var(--paper);border-radius:4px 14px 14px 14px;padding:18px;display:grid;gap:12px;position:relative;border:1px solid var(--line);min-width:0}
 .case-title{font:700 19px/1.25 var(--display);margin:0;padding-right:90px}
 .casegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -226,7 +208,7 @@ svg.reef{width:100%;height:auto;display:block;border-radius:12px}
 .say{font:600 22px/1.35 var(--display);margin:0;text-wrap:balance}
 .lg-sky{align-content:start;padding-top:26px;height:340px}
 .lg-note{position:absolute;top:calc(100% + 74px);left:50%;transform:translateX(-50%) rotate(-4deg);background:var(--paper);color:var(--ink);font-size:11px;line-height:1.3;padding:5px 7px;width:130px;border:1px solid var(--line);border-radius:3px;overflow-wrap:anywhere}
-@media (prefers-reduced-motion:reduce){.tok-new,.rung.cur.just{animation:none}}
+@media (prefers-reduced-motion:reduce){.rung.cur.just{animation:none}}
 footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.flipcard,.balloon,.balloon.float{transition:none}}
 </style>
@@ -382,39 +364,6 @@ footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
       </div>
     </div>
 
-    <div class="game" id="g-id" hidden>
-      <div class="card">
-        <div><div class="eyebrow">Identity Votes &middot; inspired by Atomic Habits</div><h2>Every small action is a vote</h2></div>
-        <p class="note" style="margin:0">Pick who you're becoming. Each time you act like that person, drop a vote in the jar.</p>
-        <div class="jars" id="jars"></div>
-      </div>
-      <div class="card" id="iv-card">
-        <h3>Cast a vote</h3>
-        <div class="row"><select id="iv-who" aria-label="Who is this vote for"></select><input type="text" id="iv-what" placeholder="What did you do? e.g. walked for 10 minutes" style="flex:1 1 200px"><button class="btn primary" id="iv-cast">Vote</button></div>
-        <div id="iv-quick"></div>
-        <span class="note" id="iv-msg" role="status"></span>
-        <ul class="list" id="iv-log"></ul>
-      </div>
-      <div class="card">
-        <h3>Add an identity</h3>
-        <p class="note" style="margin:0">Up to three. Small and specific works best.</p>
-        <form class="row" id="id-form"><input type="text" id="id-name" placeholder="someone who moves every day" style="flex:1 1 200px" required><button class="btn" type="submit">Add</button></form>
-        <div class="row chips" id="id-sugg"></div>
-      </div>
-    </div>
-
-    <div class="game" id="g-room" hidden>
-      <div class="card">
-        <div><div class="eyebrow">Room Rearrange &middot; inspired by Atomic Habits</div><h2>Make good habits easy and bad ones awkward</h2></div>
-        <div class="row" id="rm-tabs"></div>
-        <p class="note" id="rm-hint" style="margin:0">Tap an item, then tap where it should go.</p>
-        <div class="room" id="room"></div>
-        <div class="meters" id="rm-meters"></div>
-        <div class="row"><button class="btn primary" id="rm-real">Make it real</button><button class="btn" id="rm-reset">Reset room</button></div>
-        <div id="rm-check" hidden></div>
-      </div>
-    </div>
-
     <div class="game" id="g-det" hidden>
       <div class="card">
         <div><div class="eyebrow">Habit Loop Detective &middot; inspired by Atomic Habits</div><h2>Crack the case of a habit you want to change</h2></div>
@@ -442,8 +391,12 @@ footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
     </div>
 
     <div class="game" id="g-flip" hidden>
-    <div class="card">
-      <div class="spread"><div><div class="eyebrow">Game · Thought Flip</div><h2>Find the balanced thought</h2></div><span class="note" id="tf-count"></span></div>
+      <div class="card" id="tf-own">
+        <div><div class="eyebrow">Thought Flip</div><h2>Write a thought. Lift it or grow it.</h2></div>
+        <div class="stack" id="tfo"></div>
+      </div>
+      <div class="card" id="tf-deckcard" hidden>
+      <div class="spread"><div><div class="eyebrow">Thought Flip · practice deck</div><h2>Spot the trap in example thoughts</h2></div><span class="note" id="tf-count"></span></div>
       <div class="flipwrap"><div class="flipcard" id="tf-card">
         <div class="face front"><span class="eyebrow" style="color:inherit;opacity:.7" id="tf-trap"></span><div class="q" id="tf-thought"></div></div>
         <div class="face back"><span class="eyebrow" id="tf-backtrap"></span><div class="q" style="font-size:16px" id="tf-why"></div><div class="note" style="color:inherit">Next time: what would you say to a friend who thought this?</div></div>
@@ -452,6 +405,8 @@ footer.help{margin-top:28px;font-size:13px;color:var(--muted)}
       <div class="feedback" id="tf-feedback" role="status"></div>
       <div><button class="btn" id="tf-next" hidden>Next card</button></div>
     </div>
+      <div><button class="btn" id="tf-mode">Practice with example cards</button></div>
+      <div class="card"><h3>Your flips</h3><ul class="list" id="tf-hist"></ul></div>
     </div>
     <div class="game" id="g-breath" hidden>
     <div class="card">
@@ -492,7 +447,7 @@ const DEF={
     {id:6,name:"Walk outside in daylight",tag:"lift",dur:20,ess:false,done:false}
   ],
   wake:"07:00",sleep:7,checkins:[],proofs:[],weeks:{},low:null,promptOffset:0,tfIndex:0,
-  habits:[],identities:[],votes:[],cases:[],ladder:{},ladderArea:"general",releases:0,rooms:{}
+  habits:[],cases:[],ladder:{},ladderArea:"general",releases:0,flips:[]
 };
 let S=Object.assign({},DEF,load()||{});
 const TAGS={deep:"Deep",creative:"Creative",social:"Social",shallow:"Shallow",lift:"Lift"};
@@ -720,18 +675,14 @@ document.getElementById("br-start").onclick=()=>{
 // ---------- games hub ----------
 const GAMES=[
  {id:"reef",name:"Reef Builder",tag:"Stack tiny habits and grow a coral reef.",src:"Atomic Habits"},
- {id:"id",name:"Identity Votes",tag:"Every small action is a vote for who you're becoming.",src:"Atomic Habits"},
- {id:"room",name:"Room Rearrange",tag:"Move things so good habits take less effort.",src:"Atomic Habits"},
  {id:"det",name:"Habit Loop Detective",tag:"Crack the cue, craving and reward behind a habit.",src:"Atomic Habits"},
  {id:"ladder",name:"Believability Ladder",tag:"Kinder self-talk, one believable step at a time.",src:"You Can Heal Your Life"},
  {id:"let",name:"Letting Go",tag:"Write down what you're carrying, then release it.",src:"You Can Heal Your Life"},
- {id:"flip",name:"Thought Flip",tag:"Spot thinking traps and find the balanced view.",src:"CBT"},
+ {id:"flip",name:"Thought Flip",tag:"Write a thought. Lift it if it's heavy, grow it if it's good.",src:"CBT"},
  {id:"breath",name:"Breathing Balloon",tag:"Box breathing to settle your body.",src:"Breathwork"}
 ];
 const GLYPH={
  reef:'<rect x="4" y="37" width="36" height="5" rx="2.5" fill="var(--sand)"/><path d="M22 38V20M22 27l-7-8M22 23l6-9M15 19l-3-6M28 14l3-5" stroke="var(--coral-a)" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="34" cy="33" r="4" fill="var(--coral-d)"/><circle cx="9" cy="33" r="3" fill="var(--coral-b)"/>',
- id:'<path d="M14 9h16v4c4 2 6 6 6 10v13a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V23c0-4 2-8 6-10z" fill="none" stroke="var(--tide)" stroke-width="2.5"/><circle cx="17" cy="33" r="3.5" fill="var(--sun)"/><circle cx="26" cy="33" r="3.5" fill="var(--sun)"/><circle cx="21.5" cy="26" r="3.5" fill="var(--sun)"/>',
- room:'<rect x="5" y="5" width="34" height="34" rx="2" fill="none" stroke="var(--ink)" stroke-width="2.5"/><path d="M22 5v14M5 22h14" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="25" y="25" width="10" height="10" rx="2" fill="var(--tide)"/><circle cx="12" cy="12" r="4" fill="var(--sun)"/>',
  det:'<circle cx="19" cy="19" r="11" fill="none" stroke="var(--social)" stroke-width="3"/><path d="M27 27l10 10" stroke="var(--social)" stroke-width="4" stroke-linecap="round"/><path d="M13.5 19a5.5 5.5 0 0 1 5.5-5.5" stroke="var(--social)" stroke-width="2" fill="none" stroke-linecap="round"/>',
  ladder:'<path d="M14 4v36M30 4v36" stroke="var(--creative)" stroke-width="3" stroke-linecap="round"/><path d="M14 12h16M14 21h16M14 30h16" stroke="var(--creative)" stroke-width="3"/>',
  let:'<ellipse cx="22" cy="15" rx="10" ry="12" fill="var(--sun)"/><path d="M22 27c-2 4 2 5 0 9" stroke="var(--muted)" stroke-width="1.5" fill="none"/><rect x="16" y="35" width="12" height="7" rx="1" fill="var(--paper)" stroke="var(--muted)"/>',
@@ -742,12 +693,10 @@ let curGame=null;
 const plural=(n,w)=>`${n} ${w}${n===1?"":"s"}`;
 function tileStat(id){
   if(id==="reef")return plural(S.habits.length,"habit");
-  if(id==="id")return plural(S.identities.reduce((a,x)=>a+x.votes,0),"vote");
-  if(id==="room")return `${Object.keys(S.rooms).filter(k=>S.rooms[k].real).length} of 3 rooms`;
   if(id==="det")return `${S.cases.length} solved`;
   if(id==="ladder")return `${Object.values(S.ladder).reduce((a,b)=>a+b,0)} of 25 rungs`;
   if(id==="let")return `${S.releases} released`;
-  if(id==="flip")return plural(CARDS.length,"card");
+  if(id==="flip")return `${(S.flips||[]).length} flipped`;
   return "1–3 min";
 }
 function renderHub(){
@@ -759,7 +708,7 @@ function openGame(id){curGame=id;$("hubwrap").hidden=true;$("g-back").hidden=fal
 $("g-back").onclick=()=>{showHub();window.scrollTo(0,0)};
 function renderGames(){
   if(!curGame){renderHub();return}
-  ({reef:renderReef,id:renderIdentity,room:renderRoom,det:renderDet,ladder:renderLadder,let:()=>{if(!lgBusy)renderLet()}}[curGame]||(()=>{}))();
+  ({reef:renderReef,flip:renderFlipOwn,det:renderDet,ladder:renderLadder,let:()=>{if(!lgBusy)renderLet()}}[curGame]||(()=>{}))();
 }
 function chipRow(el,list,fn){el.innerHTML="";list.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="chip-btn";b.textContent=t;b.onclick=()=>fn(t);el.appendChild(b)})}
 function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -817,96 +766,7 @@ $("reef-form").onsubmit=e=>{
   $("rf-cue").value="";$("rf-habit").value="";$("rf-two").checked=false;m.textContent="Planted. Check it off when you do it.";commit();
 };
 
-// ---------- 2. Identity Votes ----------
-let lastVoteFor=null;
-const LEVELS=[[0,"Just started",5],[5,"Building",15],[15,"Regular",35],[35,"Committed",70],[70,"It's who I am",Infinity]];
-function level(n){return LEVELS.filter(l=>n>=l[0]).pop()}
-function jarSVG(n,isNew){
-  let s=`<svg viewBox="0 0 120 150" aria-hidden="true"><path d="M32 12h56v12c14 8 20 20 20 34v74a10 10 0 0 1-10 10H22a10 10 0 0 1-10-10V58c0-14 6-26 20-34z" fill="var(--tide-soft)" stroke="var(--tide)" stroke-width="3"/><rect x="28" y="6" width="64" height="9" rx="3" fill="var(--tide)"/>`;
-  const shown=Math.min(n,56);
-  for(let i=0;i<shown;i++){const row=Math.floor(i/7),col=i%7,off=row%2?6:0;const x=24+col*12+off-(row%2?3:0),y=132-row*11;
-    s+=`<circle cx="${Math.min(x,98)}" cy="${y}" r="5.5" fill="var(--sun)" stroke="var(--surface)" stroke-width="1"${isNew&&i===shown-1?' class="tok-new"':""}/>`}
-  return s+"</svg>";
-}
-function renderIdentity(){
-  const jars=$("jars");
-  if(!S.identities.length)jars.innerHTML='<p class="note" style="margin:0">No jars yet. Add who you\'re becoming below, for example "someone who moves every day".</p>';
-  else{jars.innerHTML="";S.identities.forEach(it=>{
-    const lv=level(it.votes),d=document.createElement("div");d.className="jar";
-    d.innerHTML=`<button class="icon-btn" aria-label="Remove identity">×</button>${jarSVG(it.votes,lastVoteFor===it.id)}<strong>I'm ${esc(it.name)}</strong><span class="lvl">${lv[1]}</span><span class="fit">${plural(it.votes,"vote")}${lv[2]!==Infinity?` · ${lv[2]-it.votes} to next level`:""}</span>`;
-    d.querySelector("button").onclick=()=>{S.identities=S.identities.filter(x=>x!==it);commit()};jars.appendChild(d)})}
-  lastVoteFor=null;
-  $("iv-card").hidden=!S.identities.length;
-  const sel=$("iv-who"),prev=sel.value;sel.innerHTML=S.identities.map(it=>`<option value="${it.id}">${esc(it.name)}</option>`).join("");if(prev)sel.value=prev;
-  const t=todayStr();
-  const quick=[...S.tasks.filter(x=>x.done).map(x=>x.name),...S.habits.filter(h=>h.days[t]).map(h=>h.tiny),...S.proofs.filter(p=>p.date===t).map(p=>p.text)].filter((v,i,a)=>v&&a.indexOf(v)===i).slice(0,6);
-  const q=$("iv-quick");q.innerHTML="";
-  if(quick.length){const lab=document.createElement("div");lab.className="eyebrow";lab.style.marginBottom="6px";lab.textContent="Things you did today · tap to vote";q.appendChild(lab);const r=document.createElement("div");r.className="row chips";q.appendChild(r);chipRow(r,quick.map(x=>x.length>48?x.slice(0,46)+"…":x),txt=>{$("iv-what").value=txt;castVote()})}
-  $("iv-log").innerHTML=S.votes.slice(0,6).map(v=>`<li class="proof"><time>${v.date} · ${esc(v.who)}</time>${esc(v.what)}</li>`).join("");
-  chipRow($("id-sugg"),["someone who moves every day","a person who writes daily","someone who's kind to myself","someone who keeps promises to myself"].filter(x=>!S.identities.some(i=>i.name===x)),t=>{$("id-name").value=t});
-}
-function castVote(){
-  const it=S.identities.find(x=>String(x.id)===$("iv-who").value),what=$("iv-what").value.trim();
-  if(!it){return}if(!what){$("iv-msg").textContent="Write what you did, even something small.";return}
-  it.votes++;S.votes.unshift({date:todayStr(),who:it.name,what});S.votes=S.votes.slice(0,100);lastVoteFor=it.id;
-  $("iv-what").value="";$("iv-msg").textContent=`Vote cast. That's evidence you're ${it.name}.`;commit();
-}
-$("iv-cast").onclick=castVote;
-$("iv-what").onkeydown=e=>{if(e.key==="Enter")castVote()};
-$("id-form").onsubmit=e=>{e.preventDefault();const n=$("id-name").value.trim();if(!n)return;
-  if(S.identities.length>=3){$("iv-msg").textContent="";$("id-name").value="";alertNote("id-sugg","Three is the limit. Remove one to add another.");return}
-  S.identities.push({id:Date.now(),name:n.replace(/^i'?m\s+/i,""),votes:0});$("id-name").value="";commit()};
-function alertNote(afterId,txt){const el=$(afterId);el.innerHTML=`<span class="note">${txt}</span>`}
-
-// ---------- 3. Room Rearrange ----------
-const ROOMS={
- phone:{title:"Less scrolling at night",good:"Ease of reading before sleep",bad:"Effort to start scrolling",zones:["Bed","Bedside table","Desk","Hallway"],items:[
-  {id:"phone",name:"Phone",start:0,z:[[0,0],[0,1],[0,2],[0,3]],act:{2:"Leave your phone on the desk tonight, away from the bed.",3:"Leave your phone in the hallway tonight."}},
-  {id:"charger",name:"Phone charger",start:1,z:[[0,0],[0,0],[0,1],[0,3]],act:{2:"Move your phone charger to the desk.",3:"Plug your charger in outside the bedroom."}},
-  {id:"book",name:"A book you like",start:2,z:[[3,0],[3,0],[1,0],[0,0]],act:{0:"Put a book on your pillow before evening.",1:"Keep a book on your bedside table."}},
-  {id:"lamp",name:"Reading lamp",start:2,z:[[1,0],[2,0],[0,0],[0,0]],act:{1:"Set up a reading lamp beside your bed."}}]},
- writing:{title:"Start writing in the morning",good:"Ease of starting to write",bad:"Effort to get distracted",zones:["Desk","Bed","Kitchen","Drawer"],items:[
-  {id:"laptop",name:"Laptop, draft open",start:1,z:[[3,0],[1,0],[1,0],[0,0]],act:{0:"Before bed, leave your laptop on the desk with tomorrow's draft open."}},
-  {id:"phone",name:"Phone",start:0,z:[[0,0],[0,0],[0,2],[0,3]],act:{2:"Leave your phone in the kitchen while you write.",3:"Put your phone in a drawer until you've written one paragraph."}},
-  {id:"note",name:"Note with first sentence",start:3,z:[[2,0],[0,0],[1,0],[0,0]],act:{0:"Write tomorrow's first sentence on a sticky note and stick it on the screen."}},
-  {id:"head",name:"Headphones",start:3,z:[[1,1],[0,0],[0,0],[0,0]],act:{0:"Keep headphones on the desk to block out noise."}}]},
- water:{title:"Drink more water",good:"Ease of drinking water",bad:"Effort to grab a sugary drink",zones:["Desk","Kitchen counter","Back of cupboard","Bag"],items:[
-  {id:"bottle",name:"Water bottle",start:1,z:[[3,0],[1,0],[0,0],[2,0]],act:{0:"Keep a filled water bottle on your desk.",3:"Pack a water bottle in your bag every morning."}},
-  {id:"soda",name:"Soft drinks",start:1,z:[[0,0],[0,0],[0,3],[0,0]],act:{2:"Move soft drinks to the back of the cupboard."}},
-  {id:"glass",name:"Clean glass",start:2,z:[[2,0],[2,0],[0,0],[0,0]],act:{0:"Keep a glass on your desk.",1:"Leave a clean glass next to the tap."}},
-  {id:"fruit",name:"Fruit bowl",start:2,z:[[1,0],[2,1],[0,0],[1,0]],act:{1:"Put a fruit bowl on the kitchen counter."}}]}
-};
-let roomKey="phone",roomSel=null;
-function roomState(){const R=ROOMS[roomKey];if(!S.rooms[roomKey])S.rooms[roomKey]={pos:Object.fromEntries(R.items.map(i=>[i.id,i.start]))};return S.rooms[roomKey]}
-function renderRoom(){
-  const R=ROOMS[roomKey],st=roomState();
-  const tabs=$("rm-tabs");tabs.innerHTML="";
-  Object.entries(ROOMS).forEach(([k,r])=>{const b=document.createElement("button");b.className="btn";b.setAttribute("aria-pressed",k===roomKey);if(k===roomKey){b.classList.add("primary")}b.textContent=r.title;b.onclick=()=>{roomKey=k;roomSel=null;$("rm-check").hidden=true;renderRoom()};tabs.appendChild(b)});
-  const room=$("room");room.innerHTML="";
-  R.zones.forEach((zn,zi)=>{
-    const z=document.createElement("div");z.className="zone"+(roomSel?" target":"");z.tabIndex=0;z.setAttribute("role","button");z.setAttribute("aria-label","Place here: "+zn);
-    z.innerHTML=`<span class="zl">${zn}</span>`;
-    R.items.filter(it=>st.pos[it.id]===zi).forEach(it=>{const b=document.createElement("button");b.className="item";b.textContent=it.name;b.setAttribute("aria-pressed",roomSel===it.id);
-      b.onclick=e=>{e.stopPropagation();roomSel=roomSel===it.id?null:it.id;renderRoom()};z.appendChild(b)});
-    const place=()=>{if(!roomSel)return;st.pos[roomSel]=zi;roomSel=null;$("rm-check").hidden=true;commit()};
-    z.onclick=place;z.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();place()}};
-    room.appendChild(z);
-  });
-  $("rm-hint").textContent=roomSel?`Now tap where the ${R.items.find(i=>i.id===roomSel).name.toLowerCase()} should go.`:"Tap an item, then tap where it should go.";
-  let g=0,gm=0,b=0,bm=0;R.items.forEach(it=>{const v=it.z[st.pos[it.id]];g+=v[0];b+=v[1];gm+=Math.max(...it.z.map(x=>x[0]));bm+=Math.max(...it.z.map(x=>x[1]))});
-  const pg=Math.round(g/gm*100),pb=Math.round(b/bm*100);
-  $("rm-meters").innerHTML=`<div class="meter"><span>${R.good}</span><b>${pg}%</b><div class="bar"><span style="width:${pg}%;background:var(--tide)"></span></div></div><div class="meter"><span>${R.bad}</span><b>${pb}%</b><div class="bar"><span style="width:${pb}%;background:var(--sun)"></span></div></div>`+(pg>=90&&pb>=90?'<p class="note" style="margin:0">That\'s a great setup. Good habits are easy and the bad one takes effort.</p>':"");
-}
-$("rm-real").onclick=()=>{
-  const R=ROOMS[roomKey],st=roomState();const acts=R.items.map(it=>it.act[st.pos[it.id]]).filter(Boolean);
-  const box=$("rm-check");box.hidden=false;
-  if(!acts.length){box.innerHTML='<p class="note" style="margin:0">Move a few items to better spots first.</p>';return}
-  st.real=true;save();
-  box.innerHTML=`<h3 style="margin-bottom:8px">Do these in your real room</h3><ul class="checklist">${acts.map((a,i)=>`<li><label><input type="checkbox" id="rmc-${roomKey}-${i}">${a}</label></li>`).join("")}</ul>`;
-};
-$("rm-reset").onclick=()=>{delete S.rooms[roomKey];roomSel=null;$("rm-check").hidden=true;commit()};
-
-// ---------- 4. Habit Loop Detective ----------
+// ---------- Habit Loop Detective ----------
 const CASES=[
  {id:"scroll",title:"The Case of the Endless Scroll",habit:"Scrolling social media when I should be working",
   cue:["I get stuck on a hard task","I feel bored","A notification pops up"],craving:["Relief from feeling stuck","Something new and fun","To feel connected"],
@@ -960,7 +820,7 @@ function renderDet(){
 }
 function lowerFirst(t){return /^(I |I'|A notification)/.test(t)?t.replace(/^A /,"a "):t.charAt(0).toLowerCase()+t.slice(1)}
 
-// ---------- 5. Believability Ladder ----------
+// ---------- Believability Ladder ----------
 const LADDERS={
  general:{name:"Myself",rungs:["I'm willing to be a bit kinder to myself.","I'm learning to notice when I'm harsh with myself.","I'm doing my best with what I have today.","I'm allowed to have needs and limits.","I'm okay as I am, and I can still grow."]},
  work:{name:"My work",rungs:["I'm willing to look at my work more fairly.","I've done good work before, even if not every time.","Learning includes getting things wrong.","My worth isn't the same as today's output.","I bring something useful to my work."]},
@@ -985,7 +845,7 @@ function renderLadder(){
   });
 }
 
-// ---------- 6. Letting Go ----------
+// ---------- Letting Go ----------
 let lgStep=0,lgText="",lgBusy=false,lgTimer=null;
 function renderLet(){
   const st=$("lg-step"),bal=$("lg-balloon"),note=$("lg-note"),ph=$("lg-phase");
@@ -1011,6 +871,105 @@ function renderLet(){
       $("lg-again").onclick=()=>{lgStep=0;renderLet()}};
   }
 }
+
+// ---------- Thought Flip: your own thought ----------
+const TRAPS={
+ allnothing:{name:"All-or-nothing",w:"Seeing things as total success or total failure, with nothing in between."},
+ overgen:{name:"Overgeneralizing",w:"Taking one or two events and deciding it is always like this."},
+ label:{name:"Labeling",w:"Turning one action into a judgment of your whole self."},
+ mind:{name:"Mind reading",w:"Assuming you know what someone else thinks, without real evidence."},
+ catastrophe:{name:"Catastrophizing",w:"Jumping to the worst possible outcome and treating it as likely."},
+ should:{name:"Should statements",w:"Holding yourself to rigid rules about how you must be."},
+ fortune:{name:"Fortune telling",w:"Predicting things will go badly as if you already know the future."},
+ emotional:{name:"Emotional reasoning",w:"Treating a feeling as proof that something is true."},
+ harsh:{name:"A heavy thought",w:"Some thoughts are just heavy. You don't have to argue with them, only make a little room beside them."}
+};
+const LIFTS={
+ allnothing:["Some of it went well, and the rest can wait for tomorrow.","It doesn't have to be perfect to count.","There's a middle ground between total success and failure, and I'm standing in it.","One part being hard doesn't cancel the parts that worked."],
+ overgen:["This happened this time. It doesn't mean it always will.","I can remember at least one time it went differently.","Not everyone and not always. Some things have gone right too.","A bad stretch is a stretch, not forever."],
+ label:["I made a mistake. That doesn't make me a mistake.","I'm a whole person, not one bad moment.","I'm learning, and learning includes getting things wrong.","I'd never call a friend that, and I don't deserve it either."],
+ mind:["I don't actually know what they think. I could ask.","Most people are busy with their own worries, not judging me.","I'm guessing, and the evidence is unclear.","Someone who matters to me has shown they care."],
+ catastrophe:["This is hard, but it's probably not the end of the story.","Even if the worst happened, I've coped with hard things before.","What's the most likely outcome, rather than the worst one?","I only need to handle today, one step at a time."],
+ should:["I'd like to do better, and I can be gentle while I try.","I'm doing what I can with the energy I have.","There's no rule that says I must. I get to choose what matters.","Progress at my own pace is still progress."],
+ fortune:["I can't see the future. It might go better than I fear.","I don't know how this ends yet.","I've been wrong about bad predictions before.","I can prepare for it instead of predicting it."],
+ emotional:["I feel this strongly, but feelings aren't facts.","This feeling is real, and it will pass.","I can notice the feeling without obeying it.","Feeling scared doesn't mean something bad will happen."],
+ harsh:["This is a hard moment, not a hard life.","I can be kind to myself right now.","I've gotten through difficult days before.","I'd tell a friend who felt this to be gentle with themselves. I can tell myself the same.","It's okay to feel this. It won't feel this way forever."]
+};
+const BOOSTS=["This is proof I can do more than I think.","I want more days like this, so I'll notice what made it work.","I earned this, and I'm allowed to feel proud.","Small wins like this add up to big changes.","This is who I'm becoming.","I'll remember this the next time things feel hard.","Good things happen when I show up for myself.","I can build on this tomorrow."];
+const CHEERS=["That's a thought worth keeping.","Love this. Let's make it stick.","Minds hold on to bad moments and let good ones slip away. This one deserves to stay.","Good thoughts grow when you give them attention.","Yes. Notice how that feels."];
+const NEGW=["never","always","can't","cant","cannot","useless","stupid","idiot","failure","failed","fail","failing","hate","worthless","nobody","no one","ruined","terrible","awful","worst","behind","lazy","mess","hopeless","alone","lonely","ugly","nothing","doomed","impossible","afraid","scared","anxious","worried","worry","sad","tired","exhausted","overwhelmed","stuck","pathetic","disappointed","disappointment","embarrassed","ashamed","guilty","loser","weak","waste","wasted","should","must","bad","wrong","fraud","annoyed","angry","upset","lost","broken"];
+const POSW=["proud","happy","good","great","well","managed","finished","love","loved","grateful","glad","excited","learned","enjoyed","calm","better","progress","achieved","won","helped","kind","strong","confident","hopeful","awesome","amazing","fun","peaceful","relaxed","productive","succeeded","success","thankful","blessed","beautiful","brave","capable","nailed","improved","lucky","enjoy","smiled","laughed","excellent","wonderful","fantastic","completed","accomplished"];
+const pick=(arr,n,avoid=[])=>{const a=arr.filter(x=>!avoid.includes(x));for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)};
+function detectTrap(s){
+  if(/\b(they|he|she|everyone|people|nobody|my \w+) (think|thinks|must think|probably think|hate|hates|don't like|doesn't like|judge|judges|are judging|is judging|are laughing|is laughing|think i'm|thinks i'm)/.test(s))return"mind";
+  if(/\bi(?:'m| am) (?:a |an |so |such an? |such |just |totally |a total |the )?(idiot|stupid|useless|failure|loser|lazy|worthless|ugly|mess|pathetic|weak|fraud|disappointment|hopeless)\b/.test(s))return"label";
+  if(/(career is over|life is over|it's over|ruined|disaster|end of the world|never recover|falling apart|worst thing)/.test(s))return"catastrophe";
+  if(/\b(will|i'll|going to|gonna|won't|never going to) (fail|never|go wrong|mess|lose|be rejected|get rejected|ever|work out)/.test(s))return"fortune";
+  if(/\b(always|never|every time|nothing ever|no one|nobody|everyone|everything)\b/.test(s))return"overgen";
+  if(/\b(complete|completely|total|totally|waste|wasted|perfect|perfectly|at all|nothing)\b/.test(s))return"allnothing";
+  if(/\b(should|shouldn't|must|have to|ought)\b/.test(s))return"should";
+  if(/\b(i feel|feel like|i'm feeling|i am feeling)\b/.test(s))return"emotional";
+  return null;
+}
+function classify(text){
+  const s=" "+text.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z' ]/g," ").replace(/\s+/g," ")+" ";
+  let n=0,p=0;
+  NEGW.forEach(w=>{if(s.includes(" "+w+" "))n++});
+  POSW.forEach(w=>{if(s.includes(" "+w+" "))p++});
+  if(/\b(not|never|don't|didn't|can't|isn't|wasn't|won't|no longer)\s+(very\s+|really\s+|good\s+)?(good|happy|enough|able|worth|great|proud|well|fine|okay)/.test(s)){n+=2;p=Math.max(0,p-1)}
+  if(/\bnot (bad|terrible|awful)\b/.test(s)){p+=1;n=Math.max(0,n-1)}
+  const trap=detectTrap(s);if(trap)n++;
+  return {kind:n>p?"heavy":p>n?"good":"unsure",trap:trap||"harsh"};
+}
+let tfo={step:"write",text:""};
+function flipFace(front,back,flipped,sunny){
+  return `<div class="flipwrap"><div class="flipcard${flipped?" flipped":""}" id="tfo-card"><div class="face front${sunny?" sunny":""}">${front}</div><div class="face back${sunny?" sunny":""}">${back}</div></div></div>`;
+}
+function renderFlipOwn(){
+  const el=$("tfo");
+  if(tfo.step==="write"){
+    el.innerHTML=`<label class="f">What's on your mind? One sentence is enough.<textarea id="tfo-text" placeholder="e.g. I wasted the whole day and I'm so behind.">${esc(tfo.text)}</textarea></label><div class="row"><button class="btn primary" id="tfo-go">Flip it</button><span class="note">Heavy thoughts get lifted. Good thoughts get grown.</span></div>`;
+    $("tfo-text").oninput=e=>tfo.text=e.target.value;
+    $("tfo-go").onclick=()=>{
+      const t=$("tfo-text").value.trim();if(!t)return;tfo.text=t;
+      if(CRISIS.test(t)){tfo.step="support";renderFlipOwn();return}
+      const c=classify(t);tfo.trap=c.trap;tfo.step=c.kind==="unsure"?"ask":c.kind;tfo.opts=null;renderFlipOwn();
+    };
+  }else if(tfo.step==="support"){
+    el.innerHTML=`<div class="support"><strong>Thank you for writing that down. This sounds really heavy.</strong><span>This is more than a game can help with, and you deserve to talk to a real person. In India, Tele-MANAS is free and open 24/7: <span class="num">14416</span> or <span class="num">1-800-891-4416</span>. If you are in danger, call <span class="num">112</span>.</span><span>Outside India, your local emergency number or a crisis line can help.</span></div><div class="row"><button class="btn" id="tfo-reset">Back</button></div>`;
+    tfo.text="";$("tfo-reset").onclick=()=>{tfo={step:"write",text:""};renderFlipOwn()};
+  }else if(tfo.step==="ask"){
+    el.innerHTML=`<div class="proof"><time>Your thought</time>${esc(tfo.text)}</div><h3>Is this thought weighing on you, or lifting you up?</h3><div class="row"><button class="btn" id="tfo-h">Weighing on me</button><button class="btn" id="tfo-g">Lifting me up</button><button class="btn" id="tfo-edit">Edit my thought</button></div>`;
+    $("tfo-edit").onclick=()=>{tfo.step="write";renderFlipOwn()};
+    $("tfo-h").onclick=()=>{tfo.step="heavy";renderFlipOwn()};$("tfo-g").onclick=()=>{tfo.step="good";renderFlipOwn()};
+  }else if(tfo.step==="heavy"||tfo.step==="good"){
+    const heavy=tfo.step==="heavy",T=TRAPS[tfo.trap];
+    if(!tfo.opts)tfo.opts=heavy?[...pick(LIFTS[tfo.trap],tfo.trap==="harsh"?3:2),...(tfo.trap==="harsh"?[]:pick(LIFTS.harsh,1))].sort(()=>Math.random()-.5):pick(BOOSTS,3);
+    if(heavy&&!tfo.cheer)tfo.cheer="";
+    if(!heavy&&!tfo.cheer)tfo.cheer=pick(CHEERS,1)[0];
+    const front=heavy?`<span class="eyebrow" style="color:inherit;opacity:.7">${tfo.trap==="harsh"?"A heavy thought":"Thinking trap: "+T.name}</span><div class="q">“${esc(tfo.text)}”</div>${tfo.trap!=="harsh"?`<div class="note" style="color:inherit;opacity:.75">${T.w}</div>`:""}`
+      :`<span class="eyebrow" style="color:inherit">A good thought</span><div class="q">“${esc(tfo.text)}”</div><div class="note" style="color:inherit">${tfo.cheer}</div>`;
+    el.innerHTML=flipFace(front,"",false,!heavy)+`<h3>${heavy?"Pick a thought that lifts this one":"Pick a way to grow it"}</h3><div class="opts" id="tfo-opts"></div><div class="ownrow"><input type="text" id="tfo-own" placeholder="${heavy?"Or write your own lifting thought":"Or add your own words"}" aria-label="Your own thought"><button class="btn" id="tfo-use">Use mine</button></div><div class="row"><button class="btn" id="tfo-shuffle">Show other options</button><button class="btn" id="tfo-switch">${heavy?"Actually, this is a good thought":"Actually, this one is weighing on me"}</button><button class="btn" id="tfo-edit">Edit my thought</button></div>`;
+    $("tfo-edit").onclick=()=>{tfo.step="write";tfo.opts=null;tfo.cheer=null;renderFlipOwn()};
+    const done=t=>{tfo.result=t;tfo.kind=heavy?"heavy":"good";tfo.step="done";S.flips=S.flips||[];S.flips.unshift({date:todayStr(),kind:tfo.kind,from:tfo.text,to:t});S.flips=S.flips.slice(0,50);commit()};
+    tfo.opts.forEach(t=>{const b=document.createElement("button");b.className="opt";b.textContent=t;b.onclick=()=>done(t);$("tfo-opts").appendChild(b)});
+    $("tfo-use").onclick=()=>{const v=$("tfo-own").value.trim();if(v)done(v)};
+    $("tfo-shuffle").onclick=()=>{tfo.opts=heavy?pick(tfo.trap==="harsh"?LIFTS.harsh:LIFTS[tfo.trap].concat(LIFTS.harsh),3,tfo.opts):pick(BOOSTS,3,tfo.opts);renderFlipOwn()};
+    $("tfo-switch").onclick=()=>{tfo.step=heavy?"good":"heavy";tfo.opts=null;tfo.cheer=null;renderFlipOwn()};
+  }else if(tfo.step==="done"){
+    const heavy=tfo.kind==="heavy",T=TRAPS[tfo.trap];
+    const front=heavy?`<span class="eyebrow" style="color:inherit;opacity:.7">Heavy thought</span><div class="q">“${esc(tfo.text)}”</div>`:`<span class="eyebrow" style="color:inherit">A good thought</span><div class="q">“${esc(tfo.text)}”</div>`;
+    const back=heavy?`<span class="eyebrow">Lifted</span><div class="q">“${esc(tfo.result)}”</div><div class="note" style="color:inherit;text-decoration:line-through;opacity:.6">${esc(tfo.text)}</div>`
+      :`<span class="eyebrow">Grown</span><div class="q">“${esc(tfo.text)}”</div><div class="q" style="font-size:17px">${esc(tfo.result)}</div>`;
+    el.innerHTML=flipFace(front,back,false,!heavy)+`<p class="feedback" style="margin:0">${heavy?"Read the lifted thought slowly, once more. You don't have to fully believe it yet. Making room for it is enough.":"Keep this one. On a low day, ebb can remind you of it."}</p><div class="row">${heavy?"":`<button class="btn primary" id="tfo-proof">Save to Proof of me</button>`}<button class="btn${heavy?" primary":""}" id="tfo-again">Flip another thought</button></div><span class="note" id="tfo-msg" role="status"></span>`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{const c=$("tfo-card");if(c)c.classList.add("flipped")}));
+    const pb=$("tfo-proof");if(pb)pb.onclick=()=>{S.proofs.unshift({date:todayStr(),q:"Thought Flip",text:tfo.text});pb.disabled=true;pb.textContent="Saved";save();$("tfo-msg").textContent="It's in Proof of me, ready for a low day."};
+    $("tfo-again").onclick=()=>{tfo={step:"write",text:""};renderFlipOwn()};
+  }
+  const h=$("tf-hist");
+  h.innerHTML=(S.flips||[]).length?S.flips.slice(0,8).map(f=>`<li class="proof"><time>${f.date} · ${f.kind==="heavy"?"Lifted":"Grown"}</time><span style="color:var(--muted)">${esc(f.from)}</span><br>${esc(f.to)}</li>`).join(""):'<li class="note">Your flipped thoughts collect here.</li>';
+}
+$("tf-mode").onclick=()=>{const own=!$("tf-own").hidden;$("tf-own").hidden=own;$("tf-deckcard").hidden=!own;$("tf-mode").textContent=own?"Write my own thought":"Practice with example cards"};
 
 // ---------- wiring ----------
 document.getElementById("addform").onsubmit=e=>{
